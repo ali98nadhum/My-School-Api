@@ -66,3 +66,14 @@ exports.protect = asyncHandler(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.allowedTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "غير مصرح لك بالوصول إلى هذا المسار.",
+      });
+    }
+    next();
+  };
+};

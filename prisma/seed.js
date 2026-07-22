@@ -30,6 +30,12 @@ async function main() {
     { code: 'VIEW_SCHOOL_DETAILS', description: 'عرض تفاصيل مدرسة محددة' },
     { code: 'UPDATE_SCHOOL', description: 'تحديث بيانات مدرسة' },
     { code: 'DELETE_SCHOOL', description: 'حذف مدرسة' },
+
+    { code: 'CREATE_USER', description: 'إنشاء مستخدم جديد' },
+    { code: 'VIEW_USERS', description: 'عرض قائمة المستخدمين' },
+    { code: 'VIEW_USER_DETAILS', description: 'عرض تفاصيل مستخدم محدد' },
+    { code: 'UPDATE_USER', description: 'تحديث بيانات مستخدم' },
+    { code: 'DELETE_USER', description: 'حذف مستخدم' },
   ];
 
   console.log('جاري ضخ الصلاحيات (Permissions) إلى قاعدة البيانات...');

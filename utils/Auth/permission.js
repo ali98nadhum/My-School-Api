@@ -11,7 +11,7 @@ exports.checkPermission = (requiredPermissionCode) => {
 
     const userRole = req.user.role;
 
-    if (userRole === 'SUPER_ADMIN' || userRole === 'PRINCIPAL') {
+    if (userRole === 'SUPER_ADMIN') {
       return next();
     }
 
