@@ -39,6 +39,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
       role: true,
       isActive: true,
       lockedUntil: true,
+      schoolId: true,
     },
   });
 

@@ -7,6 +7,7 @@ const app = express();
 const { errorHandler } = require("./Middlewares/errorHandler");
 const authRoutes = require("./Routes/Auth/AuthRoutes");
 const SystemRoutes = require("./Routes/SystemRoutes/SystemRoutes");
+const ManagementRoutes = require("./Routes/ManagementRoutes/ManagementRoutes");
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use(morgan('dev'));
 // ===== Routes =====
 app.use("/api/auth", authRoutes);
 app.use("/api/system", SystemRoutes);
+app.use("/api/management", ManagementRoutes);
 
 
 
@@ -47,10 +49,14 @@ app.all(/(.*)/, (req, res, next) => {
 app.use(errorHandler);
 
 // ===== Start =====
-const port = process.env.PORT || 8000;
-app.listen(port , () => {
+if (require.main === module) {
+  const port = process.env.PORT || 8000;
+  app.listen(port, () => {
     console.log(`-----------------------------------------------`);
     console.log(`🚀 Server is running on port ${port}`);
     console.log(`📝 Swagger Docs: http://localhost:${port}/api-docs`);
     console.log(`-----------------------------------------------`);
-});
+  });
+}
+
+module.exports = app;
