@@ -1,0 +1,772 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================================
+// القوائم الثابتة (ENUMS) - تحدد الخيارات المسموحة لبعض الحقول
+// =====================================================================
+
+// أدوار المستخدمين في النظام
+enum UserRole {
+  SUPER_ADMIN   @map("super_admin") // مدير النظام (أعلى صلاحية)
+  PRINCIPAL     @map("principal") // مدير المدرسة
+  TEACHER       @map("teacher") // معلم
+  STUDENT       @map("student") // طالب
+  PARENT        @map("parent") // ولي أمر
+  ACCOUNTANT    @map("accountant") // محاسب
+  ADMINISTRATOR @map("administrator") // إداري
+
+  @@map("user_role_enum")
+}
+
+// صلة القرابة لولي الأمر
+enum GuardianRelationship {
+  FATHER         @map("father")
+  MOTHER         @map("mother")
+  GRANDFATHER    @map("grandfather")
+  GRANDMOTHER    @map("grandmother")
+  UNCLE          @map("uncle")
+  AUNT           @map("aunt")
+  BROTHER        @map("brother")
+  SISTER         @map("sister")
+  LEGAL_GUARDIAN @map("legal_guardian") // وصي قانوني
+  OTHER          @map("other")
+
+  @@map("guardian_relationship_enum")
+}
+
+// الجنس
+enum Gender {
+  MALE   @map("male")
+  FEMALE @map("female")
+
+  @@map("gender_enum")
+}
+
+// حالة تسجيل الطالب
+enum EnrollmentStatus {
+  ACTIVE      @map("active") // نشط/مستمر
+  TRANSFERRED @map("transferred") // منقول
+  WITHDRAWN   @map("withdrawn") // منسحب
+  GRADUATED   @map("graduated") // خريج
+  SUSPENDED   @map("suspended") // مفصول/موقوف
+
+  @@map("enrollment_status_enum")
+}
+
+// حالة الحضور والغياب
+enum AttendanceStatus {
+  PRESENT  @map("present") // حاضر
+  ABSENT   @map("absent") // غائب
+  LATE     @map("late") // متأخر
+  EXCUSED  @map("excused") // مجاز/عذر
+  HALF_DAY @map("half_day") // نصف يوم
+
+  @@map("attendance_status_enum")
+}
+
+// حالة الفواتير (للمحاسبة)
+enum InvoiceStatus {
+  UNPAID    @map("unpaid") // غير مدفوعة
+  PARTIAL   @map("partial") // مدفوعة جزئياً
+  PAID      @map("paid") // مدفوعة بالكامل
+  OVERDUE   @map("overdue") // متأخرة الدفع
+  CANCELLED @map("cancelled") // ملغاة
+
+  @@map("invoice_status_enum")
+}
+
+// طرق الدفع
+enum PaymentMethod {
+  CASH          @map("cash") // نقدي
+  CARD          @map("card") // بطاقة بنكية
+  BANK_TRANSFER @map("bank_transfer") // تحويل بنكي
+  ONLINE        @map("online") // دفع إلكتروني
+  CHEQUE        @map("cheque") // شيك
+
+  @@map("payment_method_enum")
+}
+
+// حالة الواجبات المدرسية
+enum HomeworkStatus {
+  ASSIGNED  @map("assigned") // تم التكليف
+  SUBMITTED @map("submitted") // تم التسليم
+  LATE      @map("late") // تسليم متأخر
+  MISSING   @map("missing") // لم يتم التسليم
+  GRADED    @map("graded") // تم التقييم/التصحيح
+
+  @@map("homework_status_enum")
+}
+
+// =====================================================================
+// 1. إدارة الحسابات، الصلاحيات، والبصمة
+// =====================================================================
+
+/// جدول المستخدمين الأساسي: أي شخص يدخل للنظام (طالب، معلم، مدير) يجب أن يكون له حساب هنا
+model User {
+  id                  Int       @id @default(autoincrement())
+  role                UserRole // دور المستخدم (يحدد واجهته وصلاحياته)
+  email               String    @unique  // الإيميل (غير حساس لحالة الأحرف)
+  phone               String?   @unique @db.VarChar(20) // رقم الهاتف
+  passwordHash        String    @map("password_hash") @db.Text // كلمة المرور المشفرة
+  isActive            Boolean   @default(true) @map("is_active") // هل الحساب مفعل؟
+  isEmailVerified     Boolean   @default(false) @map("is_email_verified") // هل الإيميل مؤكد؟
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts") @db.SmallInt // عدد محاولات الدخول الفاشلة
+  lockedUntil         DateTime? @map("locked_until") @db.Timestamptz(6) // قفل الحساب مؤقتاً عند الخطأ المتكرر
+  lastLoginAt         DateTime? @map("last_login_at") @db.Timestamptz(6) // وقت آخر تسجيل دخول
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // الروابط بالجداول الأخرى (ملفات شخصية وتفاعلات)
+  student                   Student?
+  teacher                   Teacher?
+  parent                    Parent?
+  staffMember               StaffMember?
+  biometricCredentials      UserBiometricCredential[]
+  refreshTokens             RefreshToken[]
+  recordedAttendances       AttendanceRecord[]        @relation("AttendanceRecordedBy")
+  createdExams              Exam[]                    @relation("ExamCreatedBy")
+  enteredExamResults        ExamResult[]              @relation("ExamResultEnteredBy")
+  gradedHomeworkSubmissions HomeworkSubmission[]      @relation("HomeworkSubmissionGradedBy")
+  createdInvoices           Invoice[]                 @relation("InvoiceCreatedBy")
+  receivedPayments          Payment[]                 @relation("PaymentReceivedBy")
+
+  @@index([role])
+  @@map("users")
+}
+
+/// جدول الصلاحيات الدقيقة (مثل: إضافة طالب، حذف فاتورة)
+model Permission {
+  id              Int              @id @default(autoincrement()) @db.SmallInt
+  code            String           @unique @db.VarChar(80)
+  description     String?          @db.Text
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+/// جدول لربط كل دور (Role) بالصلاحيات المسموحة له
+model RolePermission {
+  role         UserRole
+  permissionId Int        @map("permission_id") @db.SmallInt
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([role, permissionId])
+  @@index([permissionId], map: "idx_role_permissions_perm")
+  @@map("role_permissions")
+}
+
+/// جدول تسجيل أجهزة البصمة (Hardware) الخاصة بالمدرسة
+model BiometricDevice {
+  id              Int      @id @default(autoincrement())
+  deviceSerial    String   @unique @map("device_serial") @db.VarChar(100) // الرقم التسلسلي لجهاز HF-FR05
+  model           String   @default("HF-FR05") @db.VarChar(50) // موديل الجهاز
+  location        String?  @db.VarChar(150) // مكان الجهاز (مثلاً: البوابة الرئيسية)
+  ipAddress       String?  @map("ip_address") @db.Inet // عنوان IP للجهاز
+  firmwareVersion String?  @map("firmware_version") @db.VarChar(30)
+  isActive        Boolean  @default(true) @map("is_active")
+  installedAt     DateTime @default(now()) @map("installed_at") @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  credentials UserBiometricCredential[]
+
+  @@index([deviceSerial], map: "idx_biometric_devices_serial")
+  @@map("biometric_devices")
+}
+
+/// جدول يربط وجه المستخدم بجهاز البصمة المعين
+model UserBiometricCredential {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @map("user_id") // المستخدم صاحب البصمة
+  deviceId           Int       @map("device_id") // الجهاز الذي تم تسجيل البصمة عليه
+  facialBiometricId  String    @map("facial_biometric_id") @db.VarChar(100) // المعرف القادم من جهاز البصمة
+  hardwareIdentifier String    @map("hardware_identifier") @db.VarChar(100) // توثيق للرقم التسلسلي وقت التسجيل
+  facialFeatureHash  String    @map("facial_feature_hash") @db.Text // تشفير ملامح الوجه (للأمان)
+  isActive           Boolean   @default(true) @map("is_active")
+  enrolledAt         DateTime  @default(now()) @map("enrolled_at") @db.Timestamptz(6) // تاريخ تسجيل الوجه
+  lastMatchedAt      DateTime? @map("last_matched_at") @db.Timestamptz(6) // آخر مرة تم التعرف عليه بنجاح
+  revokedAt          DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device BiometricDevice @relation(fields: [deviceId], references: [id], onDelete: Restrict)
+
+  @@unique([deviceId, facialBiometricId])
+  @@index([userId], map: "idx_user_biometric_user_id")
+  @@index([deviceId], map: "idx_user_biometric_device_id")
+  @@index([facialBiometricId], map: "idx_user_biometric_facial_id")
+  @@index([hardwareIdentifier], map: "idx_user_biometric_hardware_id")
+  @@map("user_biometric_credentials")
+}
+
+/// جدول إدارة الجلسات وتجديد الدخول (Refresh Tokens) لحماية حسابات التطبيقات
+model RefreshToken {
+  id                Int       @id @default(autoincrement())
+  userId            Int       @map("user_id")
+  tokenHash         String    @unique @map("token_hash") @db.Text // التوكين المشفر
+  deviceInfo        Json?     @map("device_info") @db.JsonB // معلومات الجهاز الذي سجل دخول (نوع الهاتف، النظام)
+  ipAddress         String?   @map("ip_address") @db.Inet
+  userAgent         String?   @map("user_agent") @db.Text
+  issuedAt          DateTime  @default(now()) @map("issued_at") @db.Timestamptz(6)
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(6) // تاريخ إنتهاء التوكين
+  isRevoked         Boolean   @default(false) @map("is_revoked") // هل تم إبطال التوكين؟ (عند تسجيل الخروج)
+  revokedAt         DateTime? @map("revoked_at") @db.Timestamptz(6)
+  replacedByTokenId Int?      @map("replaced_by_token_id") // التوكين الجديد الذي حل محله (للأمان الدوار)
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replacedBy   RefreshToken?  @relation("RefreshTokenRotation", fields: [replacedByTokenId], references: [id], onDelete: SetNull)
+  replacedFrom RefreshToken[] @relation("RefreshTokenRotation")
+
+  @@index([userId], map: "idx_refresh_tokens_user_id")
+  @@index([expiresAt], map: "idx_refresh_tokens_expires_at")
+  @@map("refresh_tokens")
+}
+
+// =====================================================================
+// 2. إدارة الأفراد (الطلاب، أولياء الأمور، المعلمين)
+// =====================================================================
+
+/// جدول بيانات ولي الأمر
+model Parent {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique @map("user_id") // ارتباط بحساب تسجيل الدخول
+  firstNameAr    String   @map("first_name_ar") @db.VarChar(100) // الاسم الأول بالعربي
+  lastNameAr     String   @map("last_name_ar") @db.VarChar(100) // اللقب بالعربي
+  firstNameEn    String   @map("first_name_en") @db.VarChar(100) // الاسم الأول بالإنجليزي
+  lastNameEn     String   @map("last_name_en") @db.VarChar(100) // اللقب بالإنجليزي
+  nationalId     String?  @unique @map("national_id") @db.VarChar(30) // الرقم الوطني/الهوية
+  occupation     String?  @db.VarChar(100) // المهنة
+  phonePrimary   String   @map("phone_primary") @db.VarChar(20) // الهاتف الأساسي للتواصل
+  phoneSecondary String?  @map("phone_secondary") @db.VarChar(20) // هاتف بديل
+  address        String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentGuardians StudentGuardian[]
+
+  @@index([userId], map: "idx_parents_user_id")
+  @@index([phonePrimary], map: "idx_parents_phone")
+  @@map("parents")
+}
+
+/// جدول بيانات المعلم
+model Teacher {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique @map("user_id")
+  employeeCode   String   @unique @map("employee_code") @db.VarChar(30) // الرقم الوظيفي للمعلم
+  firstNameAr    String   @map("first_name_ar") @db.VarChar(100)
+  lastNameAr     String   @map("last_name_ar") @db.VarChar(100)
+  firstNameEn    String   @map("first_name_en") @db.VarChar(100)
+  lastNameEn     String   @map("last_name_en") @db.VarChar(100)
+  hireDate       DateTime @map("hire_date") @db.Date // تاريخ التعيين
+  qualification  String?  @db.Text // المؤهل العلمي
+  specialization String?  @db.VarChar(100) // التخصص (رياضيات، لغة عربية..)
+  photoUrl       String?  @map("photo_url") @db.Text // صورة المعلم
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  homeroomSections       Section[]               @relation("SectionHomeroomTeacher")
+  sectionSubjectTeachers SectionSubjectTeacher[]
+  timetableEntries       TimetableEntry[]
+  lessons                Lesson[]
+  homeworks              Homework[]
+
+  @@index([userId], map: "idx_teachers_user_id")
+  @@map("teachers")
+}
+
+/// الموظفين الإداريين (المدير، المحاسب، إلخ)
+model StaffMember {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  employeeCode String   @unique @map("employee_code") @db.VarChar(30)
+  firstNameAr  String   @map("first_name_ar") @db.VarChar(100)
+  lastNameAr   String   @map("last_name_ar") @db.VarChar(100)
+  firstNameEn  String   @map("first_name_en") @db.VarChar(100)
+  lastNameEn   String   @map("last_name_en") @db.VarChar(100)
+  position     String   @db.VarChar(50) // المسمى الوظيفي
+  hireDate     DateTime @map("hire_date") @db.Date
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("staff_members")
+}
+
+/// جدول بيانات الطالب (الملف الدائم)
+model Student {
+  id               Int              @id @default(autoincrement())
+  userId           Int?             @unique @map("user_id") // يمكن أن يكون فارغاً إذا لم نعطه حساب دخول بعد
+  studentCode      String           @unique @map("student_code") @db.VarChar(30) // الرقم المدرسي/الجامعي
+  qrCode           String           @unique @default(uuid()) @map("qr_code") @db.VarChar(64) // الكود الخاص بالبطاقة المدرسية
+  firstNameAr      String           @map("first_name_ar") @db.VarChar(100)
+  middleNameAr     String?          @map("middle_name_ar") @db.VarChar(100) // اسم الأب
+  lastNameAr       String           @map("last_name_ar") @db.VarChar(100) // العائلة
+  firstNameEn      String           @map("first_name_en") @db.VarChar(100)
+  middleNameEn     String?          @map("middle_name_en") @db.VarChar(100)
+  lastNameEn       String           @map("last_name_en") @db.VarChar(100)
+  gender           Gender
+  dateOfBirth      DateTime         @map("date_of_birth") @db.Date
+  nationalId       String?          @unique @map("national_id") @db.VarChar(30)
+  nationality      String?          @db.VarChar(60)
+  enrollmentDate   DateTime         @default(now()) @map("enrollment_date") @db.Date
+  currentSectionId Int?             @map("current_section_id") // الشعبة الحالية للطالب
+  status           EnrollmentStatus @default(ACTIVE)
+  bloodType        String?          @map("blood_type") @db.VarChar(5)
+  photoUrl         String?          @map("photo_url") @db.Text
+  address          String?          @db.Text
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user                User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  currentSection      Section?             @relation(fields: [currentSectionId], references: [id], onDelete: SetNull)
+  studentGuardians    StudentGuardian[]
+  studentEnrollments  StudentEnrollment[]
+  attendanceRecords   AttendanceRecord[]
+  examResults         ExamResult[]
+  homeworkSubmissions HomeworkSubmission[]
+  invoices            Invoice[]
+
+  @@index([currentSectionId], map: "idx_students_current_section")
+  @@index([status], map: "idx_students_status")
+  @@index([nationalId], map: "idx_students_national_id")
+  @@map("students")
+}
+
+/// جدول الربط بين الطالب وأولياء الأمور (يسمح بربط الطالب بـ 4 أولياء أمور كحد أقصى)
+model StudentGuardian {
+  id                   Int                  @id @default(autoincrement())
+  studentId            Int                  @map("student_id") // معرف الطالب
+  parentId             Int                  @map("parent_id") // معرف ولي الأمر
+  relationshipType     GuardianRelationship @map("relationship_type") // نوع القرابة (أب، أم، عم..)
+  isPrimaryContact     Boolean              @default(false) @map("is_primary_contact") // هل هو جهة الاتصال الأساسية؟
+  canPickup            Boolean              @default(true) @map("can_pickup") // هل مصرح له باستلام الطالب؟
+  financialResponsible Boolean              @default(false) @map("financial_responsible") // هل هو المسؤول المالي للمصاريف؟
+  createdAt            DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parent  Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, parentId])
+  @@index([studentId], map: "idx_student_guardians_student_id")
+  @@index([parentId], map: "idx_student_guardians_parent_id")
+  @@map("student_guardians")
+}
+
+/// سجل التسجيل الأكاديمي (يحفظ تاريخ الطالب الأكاديمي عبر السنوات لتكوين السجل الدائم)
+model StudentEnrollment {
+  id             Int              @id @default(autoincrement())
+  studentId      Int              @map("student_id")
+  sectionId      Int              @map("section_id") // الشعبة التي درس بها
+  academicYearId Int              @map("academic_year_id") // السنة الدراسية المعنية
+  enrollmentDate DateTime         @default(now()) @map("enrollment_date") @db.Date
+  exitDate       DateTime?        @map("exit_date") @db.Date
+  status         EnrollmentStatus @default(ACTIVE)
+  remarks        String?          @db.Text
+
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+
+  @@unique([studentId, academicYearId])
+  @@map("student_enrollments")
+}
+
+// =====================================================================
+// 3. الهيكل الأكاديمي (السنوات، الصفوف، الجداول)
+// =====================================================================
+
+/// جدول السنوات الدراسية (مثل: 2025/2026)
+model AcademicYear {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(20)
+  startDate DateTime @map("start_date") @db.Date // بداية السنة
+  endDate   DateTime @map("end_date") @db.Date // نهاية السنة
+  isCurrent Boolean  @default(false) @map("is_current") // هل هي السنة الدراسية الحالية النشطة؟
+
+  schoolClasses          SchoolClass[]
+  sectionSubjectTeachers SectionSubjectTeacher[]
+  timetableEntries       TimetableEntry[]
+  studentEnrollments     StudentEnrollment[]
+  attendanceRecords      AttendanceRecord[]
+  exams                  Exam[]
+  lessons                Lesson[]
+  feeStructures          FeeStructure[]
+  invoices               Invoice[]
+
+  @@map("academic_years")
+}
+
+/// جدول المراحل الدراسية (الأول الابتدائي، الثاني الابتدائي..)
+model GradeLevel {
+  id        Int    @id @default(autoincrement()) @db.SmallInt
+  nameEn    String @map("name_en") @db.VarChar(50)
+  nameAr    String @map("name_ar") @db.VarChar(50)
+  sortOrder Int    @unique @map("sort_order") @db.SmallInt // لترتيب الصفوف منطقياً
+
+  schoolClasses SchoolClass[]
+  feeStructures FeeStructure[]
+
+  @@map("grade_levels")
+}
+
+/// الصفوف المرتبطة بالسنة الدراسية
+model SchoolClass {
+  id             Int    @id @default(autoincrement())
+  gradeLevelId   Int    @map("grade_level_id") @db.SmallInt
+  academicYearId Int    @map("academic_year_id")
+  nameEn         String @map("name_en") @db.VarChar(50)
+  nameAr         String @map("name_ar") @db.VarChar(50)
+
+  gradeLevel   GradeLevel   @relation(fields: [gradeLevelId], references: [id], onDelete: Restrict)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  sections     Section[]
+
+  @@unique([gradeLevelId, academicYearId])
+  @@map("school_classes")
+}
+
+/// الشعب الدراسية (مثل: شعبة أ، شعبة ب) داخل كل صف
+model Section {
+  id                Int    @id @default(autoincrement())
+  classId           Int    @map("class_id") // تابعة لأي صف؟
+  name              String @db.VarChar(10) // اسم الشعبة (A, B, أ, ب)
+  capacity          Int    @default(30) @db.SmallInt // سعة الشعبة القصوى من الطلاب
+  homeroomTeacherId Int?   @map("homeroom_teacher_id") // المعلم المرشد للشعبة/مربي الصف
+
+  schoolClass            SchoolClass             @relation(fields: [classId], references: [id], onDelete: Cascade)
+  homeroomTeacher        Teacher?                @relation("SectionHomeroomTeacher", fields: [homeroomTeacherId], references: [id], onDelete: SetNull)
+  students               Student[]
+  studentEnrollments     StudentEnrollment[]
+  sectionSubjectTeachers SectionSubjectTeacher[]
+  timetableEntries       TimetableEntry[]
+  attendanceRecords      AttendanceRecord[]
+  exams                  Exam[]
+  lessons                Lesson[]
+  homeworks              Homework[]
+
+  @@unique([classId, name])
+  @@map("sections")
+}
+
+/// المواد الدراسية (فيزياء، رياضيات..)
+model Subject {
+  id       Int     @id @default(autoincrement())
+  code     String  @unique @db.VarChar(20) // رمز المادة (مثل PHY101)
+  nameEn   String  @map("name_en") @db.VarChar(100)
+  nameAr   String  @map("name_ar") @db.VarChar(100)
+  isActive Boolean @default(true) @map("is_active")
+
+  sectionSubjectTeachers SectionSubjectTeacher[]
+  timetableEntries       TimetableEntry[]
+  exams                  Exam[]
+  lessons                Lesson[]
+  homeworks              Homework[]
+
+  @@map("subjects")
+}
+
+/// جدول توزيع المهام: أي معلم يدرس أي مادة لأي شعبة
+model SectionSubjectTeacher {
+  id             Int @id @default(autoincrement())
+  sectionId      Int @map("section_id")
+  subjectId      Int @map("subject_id")
+  teacherId      Int @map("teacher_id")
+  academicYearId Int @map("academic_year_id")
+
+  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, subjectId, academicYearId])
+  @@map("section_subject_teachers")
+}
+
+/// حصص الدوام (الحصة الأولى، الثانية..)
+model Period {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @db.VarChar(30) // اسم الحصة
+  startTime DateTime @map("start_time") @db.Time() // وقت البداية
+  endTime   DateTime @map("end_time") @db.Time() // وقت النهاية
+  sortOrder Int      @unique @map("sort_order") @db.SmallInt // الترتيب
+
+  timetableEntries  TimetableEntry[]
+  attendanceRecords AttendanceRecord[]
+
+  @@map("periods")
+}
+
+/// الجدول الدراسي الأسبوعي (يمنع تعارض الجداول برمجياً)
+model TimetableEntry {
+  id             Int     @id @default(autoincrement())
+  sectionId      Int     @map("section_id")
+  subjectId      Int     @map("subject_id")
+  teacherId      Int     @map("teacher_id")
+  periodId       Int     @map("period_id") @db.SmallInt // أي حصة؟
+  dayOfWeek      Int     @map("day_of_week") @db.SmallInt // أي يوم بالاسبوع؟ (0=الاثنين..6=الأحد)
+  room           String? @db.VarChar(30) // رقم القاعة
+  academicYearId Int     @map("academic_year_id")
+
+  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  period       Period       @relation(fields: [periodId], references: [id], onDelete: Restrict)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, dayOfWeek, periodId, academicYearId]) // يمنع إعطاء شعبة مادتين بنفس الوقت
+  @@unique([teacherId, dayOfWeek, periodId, academicYearId]) // يمنع المعلم من تدريس شعبتين بنفس الوقت
+  @@map("timetable_entries")
+}
+
+// =====================================================================
+// 4. الحضور والغياب
+// =====================================================================
+
+/// سجلات حضور وغياب الطلاب
+model AttendanceRecord {
+  id             Int              @id @default(autoincrement())
+  studentId      Int              @map("student_id")
+  sectionId      Int              @map("section_id")
+  academicYearId Int              @map("academic_year_id")
+  attendanceDate DateTime         @map("attendance_date") @db.Date // تاريخ اليوم
+  periodId       Int?             @map("period_id") @db.SmallInt // إذا كان فارغاً (NULL) يعني حضور يوم كامل، وإلا فهو حضور لحصة معينة
+  status         AttendanceStatus // حالة الحضور (حاضر، غائب..)
+  recordedBy     Int              @map("recorded_by") // من الذي سجل الحضور؟
+  remarks        String?          @db.Text
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  section        Section      @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  period         Period?      @relation(fields: [periodId], references: [id], onDelete: Restrict)
+  recordedByUser User         @relation("AttendanceRecordedBy", fields: [recordedBy], references: [id], onDelete: Restrict)
+
+  @@unique([studentId, attendanceDate, periodId]) // يمنع تسجيل حضور مكرر لنفس الطالب بنفس الحصة/اليوم
+  @@map("attendance_records")
+}
+
+// =====================================================================
+// 5. الامتحانات والدرجات
+// =====================================================================
+
+/// أنواع الامتحانات (نصفي، نهائي، شهري) ووزنها في الدرجة النهائية
+model ExamType {
+  id               Int     @id @default(autoincrement()) @db.SmallInt
+  nameEn           String  @map("name_en") @db.VarChar(50)
+  nameAr           String  @map("name_ar") @db.VarChar(50)
+  weightPercentage Decimal @default(0) @map("weight_percentage") @db.Decimal(5, 2) // نسبة الامتحان المئوية (مثل 30%)
+
+  exams Exam[]
+
+  @@map("exam_types")
+}
+
+/// الامتحان الفعلي المخصص لشعبة معينة
+model Exam {
+  id             Int      @id @default(autoincrement())
+  academicYearId Int      @map("academic_year_id")
+  examTypeId     Int      @map("exam_type_id") @db.SmallInt
+  subjectId      Int      @map("subject_id")
+  sectionId      Int      @map("section_id")
+  examDate       DateTime @map("exam_date") @db.Date // تاريخ الامتحان
+  maxScore       Decimal  @map("max_score") @db.Decimal(6, 2) // الدرجة العظمى
+  passingScore   Decimal? @map("passing_score") @db.Decimal(6, 2) // درجة النجاح
+  createdBy      Int?     @map("created_by") // المعلم المنشئ
+
+  academicYear  AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  examType      ExamType     @relation(fields: [examTypeId], references: [id], onDelete: Restrict)
+  subject       Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  section       Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdByUser User?        @relation("ExamCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  examResults   ExamResult[]
+
+  @@unique([academicYearId, examTypeId, subjectId, sectionId])
+  @@map("exams")
+}
+
+/// درجات الطلاب في الامتحانات (ترتبط بجدول الإدارة تلقائياً)
+model ExamResult {
+  id          Int      @id @default(autoincrement())
+  examId      Int      @map("exam_id")
+  studentId   Int      @map("student_id")
+  score       Decimal  @db.Decimal(6, 2) // درجة الطالب
+  gradeLetter String?  @map("grade_letter") @db.VarChar(3) // التقدير (A, B, C)
+  remarks     String?  @db.Text
+  enteredBy   Int?     @map("entered_by") // المعلم الذي رصد الدرجة
+  enteredAt   DateTime @default(now()) @map("entered_at") @db.Timestamptz(6)
+
+  exam          Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student       Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enteredByUser User?   @relation("ExamResultEnteredBy", fields: [enteredBy], references: [id], onDelete: SetNull)
+
+  @@unique([examId, studentId])
+  @@map("exam_results")
+}
+
+// =====================================================================
+// 6. إدارة التعلم والمحتوى (LMS)
+// =====================================================================
+
+/// الدروس التي يرفعها المعلم عبر التطبيق
+model Lesson {
+  id             Int      @id @default(autoincrement())
+  sectionId      Int      @map("section_id")
+  subjectId      Int      @map("subject_id")
+  teacherId      Int      @map("teacher_id")
+  academicYearId Int      @map("academic_year_id")
+  title          String   @db.VarChar(200) // عنوان الدرس
+  description    String?  @db.Text // شرح مبسط
+  lessonDate     DateTime @map("lesson_date") @db.Date // تاريخ إلقاء الدرس
+  attachmentUrl  String?  @map("attachment_url") @db.Text // رابط مرفقات (PDF, فيديو يوتيوب)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  homeworks    Homework[]
+
+  @@map("lessons")
+}
+
+/// الواجبات التي يكلف بها الطلاب
+model Homework {
+  id            Int      @id @default(autoincrement())
+  lessonId      Int?     @map("lesson_id") // هل الواجب مرتبط بدرس معين؟
+  sectionId     Int      @map("section_id")
+  subjectId     Int      @map("subject_id")
+  teacherId     Int      @map("teacher_id")
+  title         String   @db.VarChar(200) // عنوان الواجب
+  description   String?  @db.Text
+  assignedDate  DateTime @default(now()) @map("assigned_date") @db.Date // تاريخ التكليف
+  dueDate       DateTime @map("due_date") @db.Date // آخر موعد للتسليم
+  attachmentUrl String?  @map("attachment_url") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  lesson      Lesson?              @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  section     Section              @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subject     Subject              @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher     Teacher              @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  submissions HomeworkSubmission[]
+
+  @@map("homeworks")
+}
+
+/// تسليمات الواجبات (حيث يرفع الطالب الحل)
+model HomeworkSubmission {
+  id          Int            @id @default(autoincrement())
+  homeworkId  Int            @map("homework_id")
+  studentId   Int            @map("student_id")
+  submittedAt DateTime?      @map("submitted_at") @db.Timestamptz(6) // تاريخ ووقت تسليم الحل
+  fileUrl     String?        @map("file_url") @db.Text // رابط ملف الحل المرفوع
+  status      HomeworkStatus @default(ASSIGNED) // حالة التسليم (متأخر، تم التصحيح..)
+  score       Decimal?       @db.Decimal(6, 2) // الدرجة الممنوحة من المعلم
+  feedback    String?        @db.Text // ملاحظات المعلم
+  gradedBy    Int?           @map("graded_by") // المعلم المصحح
+  gradedAt    DateTime?      @map("graded_at") @db.Timestamptz(6)
+
+  homework     Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  gradedByUser User?    @relation("HomeworkSubmissionGradedBy", fields: [gradedBy], references: [id], onDelete: SetNull)
+
+  @@unique([homeworkId, studentId])
+  @@map("homework_submissions")
+}
+
+// =====================================================================
+// 7. المحاسبة والرسوم (الفواتير والدفعات)
+// =====================================================================
+
+/// أنواع الرسوم (رسوم دراسية، رسوم باص، رسوم امتحانات)
+model FeeType {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  nameEn      String  @map("name_en") @db.VarChar(80)
+  nameAr      String  @map("name_ar") @db.VarChar(80)
+  description String? @db.Text
+
+  feeStructures FeeStructure[]
+  invoiceItems  InvoiceItem[]
+
+  @@map("fee_types")
+}
+
+/// هيكلة الرسوم لكل صف دراسي (مثال: رسوم الصف الأول = 1000)
+model FeeStructure {
+  id             Int     @id @default(autoincrement())
+  gradeLevelId   Int     @map("grade_level_id") @db.SmallInt
+  academicYearId Int     @map("academic_year_id")
+  feeTypeId      Int     @map("fee_type_id") @db.SmallInt
+  amount         Decimal @db.Decimal(10, 2) // القيمة المطلوبة
+
+  gradeLevel   GradeLevel   @relation(fields: [gradeLevelId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  feeType      FeeType      @relation(fields: [feeTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([gradeLevelId, academicYearId, feeTypeId])
+  @@map("fee_structures")
+}
+
+/// الفاتورة الإجمالية المصدرة للطالب
+model Invoice {
+  id             Int           @id @default(autoincrement())
+  invoiceNumber  String        @unique @map("invoice_number") @db.VarChar(30) // رقم الفاتورة (للمحاسبة)
+  studentId      Int           @map("student_id")
+  academicYearId Int           @map("academic_year_id")
+  totalAmount    Decimal       @map("total_amount") @db.Decimal(10, 2) // إجمالي المبلغ المطلوب
+  amountPaid     Decimal       @default(0) @map("amount_paid") @db.Decimal(10, 2) // المبلغ الذي تم سداده حتى الآن
+  dueDate        DateTime      @map("due_date") @db.Date // موعد الاستحقاق الأخير
+  status         InvoiceStatus @default(UNPAID) // حالة الفاتورة (مدفوعة، متأخرة..)
+  issuedAt       DateTime      @default(now()) @map("issued_at") @db.Timestamptz(6)
+  createdBy      Int?          @map("created_by") // المحاسب الذي أصدرها
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  academicYear  AcademicYear  @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  createdByUser User?         @relation("InvoiceCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  invoiceItems  InvoiceItem[]
+  payments      Payment[]
+
+  @@map("invoices")
+}
+
+/// تفاصيل عناصر الفاتورة (مثلاً: 800 قسط + 200 رسوم زي)
+model InvoiceItem {
+  id          Int     @id @default(autoincrement())
+  invoiceId   Int     @map("invoice_id")
+  feeTypeId   Int     @map("fee_type_id") @db.SmallInt
+  description String? @db.VarChar(200)
+  amount      Decimal @db.Decimal(10, 2)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  feeType FeeType @relation(fields: [feeTypeId], references: [id], onDelete: Restrict)
+
+  @@map("invoice_items")
+}
+
+/// الدفعات والسدادات التي يدفعها الطالب أو ولي أمره
+model Payment {
+  id               Int           @id @default(autoincrement())
+  invoiceId        Int           @map("invoice_id") // الفاتورة المرتبطة بالدفع
+  amount           Decimal       @db.Decimal(10, 2) // المبلغ المدفوع
+  paymentMethod    PaymentMethod @map("payment_method") // طريقة الدفع (كاش، بطاقة)
+  paymentReference String?       @map("payment_reference") @db.VarChar(100) // رقم الإيصال أو الحوالة
+  paidAt           DateTime      @default(now()) @map("paid_at") @db.Timestamptz(6) // تاريخ الدفع
+  receivedBy       Int?          @map("received_by") // المحاسب المستلم
+  notes            String?       @db.Text
+
+  invoice        Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  receivedByUser User?   @relation("PaymentReceivedBy", fields: [receivedBy], references: [id], onDelete: SetNull)
+
+  @@map("payments")
+}

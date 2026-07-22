@@ -6,3 +6,10 @@ node_modules
 /generated/prisma
 
 postman_collection.json
+/generated/prisma
+
+
+# AI tools
+.agents/
+.claude/
+.windsurf/
