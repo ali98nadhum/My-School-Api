@@ -8,13 +8,11 @@ const { ApiError } = require("../../utils/ApiError");
 const createSchool = asyncHandler(async (req, res) => {
   let { nameAr, nameEn, address, phone } = req.body;
 
-  // تحويل القيم الفارغة إلى null لتنظيف البيانات قبل حفظها
   nameAr = nameAr || null;
   nameEn = nameEn || null;
   address = address || null;
   phone = phone || null;
 
-  // التأكد من عدم تكرار اسم المدرسة
   const conditions = [];
   if (nameAr) conditions.push({ nameAr });
   if (nameEn) conditions.push({ nameEn });
