@@ -39,10 +39,10 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError("حسابك موقوف — تواصل مع الإدارة", 403);
   }
 
-  const token = generateToken(user.id, user.role, user.schoolId);
   const refreshToken = generateRefreshToken();
   
-  await saveRefreshToken(user.id, refreshToken, req);
+  const savedRefreshToken = await saveRefreshToken(user.id, refreshToken, req);
+  const token = generateToken(user.id, user.role, user.schoolId, savedRefreshToken.id);
 
   res.status(200).json({
     status: "success",
@@ -60,6 +60,99 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
+/// ============================================================
+// POST /api/auth/refresh-token
+// ============================================================
+const refreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken: token } = req.body;
+
+  if (!token) {
+    throw new ApiError("يرجى إرسال رمز التجديد", 400);
+  }
+
+  const storedToken = await prisma.refreshToken.findUnique({
+    where: { tokenHash: token },
+    include: { user: true },
+  });
+
+  if (!storedToken || storedToken.isRevoked || storedToken.expiresAt < new Date()) {
+    throw new ApiError("جلسة الدخول منتهية أو غير صالحة. يرجى تسجيل الدخول مجدداً", 401);
+  }
+
+  if (!storedToken.user.isActive) {
+    throw new ApiError("حسابك موقوف — تواصل مع الإدارة", 403);
+  }
+
+  const newAccessToken = generateToken(
+    storedToken.user.id,
+    storedToken.user.role,
+    storedToken.user.schoolId,
+    storedToken.id
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "تم تجديد الجلسة بنجاح",
+    data: { token: newAccessToken },
+  });
+});
+
+/// ============================================================
+// POST /api/auth/logout
+// ============================================================
+const logout = asyncHandler(async (req, res) => {
+  const { refreshToken: token } = req.body;
+
+  if (!token) {
+    throw new ApiError("يرجى إرسال رمز التجديد", 400);
+  }
+
+  const result = await prisma.refreshToken.updateMany({
+    where: { tokenHash: token, isRevoked: false },
+    data: { isRevoked: true, revokedAt: new Date() },
+  });
+
+  if (result.count === 0) {
+    throw new ApiError("الجلسة غير موجودة أو تم تسجيل الخروج منها مسبقاً", 404);
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "تم تسجيل الخروج بنجاح",
+  });
+});
+
+/// ============================================================
+// POST /api/auth/change-password
+// ============================================================
+const changePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+  if (!(await bcrypt.compare(oldPassword, user.passwordHash))) {
+    throw new ApiError(
+      "كلمة المرور القديمة غير صحيحة. إذا نسيتها، يرجى مراجعـة الإدارة لحل المشكلة",
+      401
+    );
+  }
+
+  const newPasswordHash = await hashPassword(newPassword);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash: newPasswordHash },
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "تم تحديث كلمة المرور بنجاح",
+  });
+});
+
 module.exports = {
   login,
+  refreshToken,
+  logout,
+  changePassword,
 };

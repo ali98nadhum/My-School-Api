@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-const generateToken = (id, role, schoolId) => {
+const generateToken = (id, role, schoolId, sessionId = null) => {
     return jwt.sign(
-        { id, role, schoolId },
+        { id, role, schoolId, sessionId },
         process.env.JWT_SECRET,
         { expiresIn: process.env.EXPIRES_IN || '1d' }
     );

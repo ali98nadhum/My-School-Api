@@ -20,6 +20,18 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+  if (decoded.sessionId) {
+    const session = await prisma.refreshToken.findUnique({
+      where: { id: decoded.sessionId }
+    });
+    
+    if (!session || session.isRevoked) {
+      return res.status(401).json({
+        message: "الجلسة منتهية، يرجى تسجيل الدخول مجدداً.",
+      });
+    }
+  }
+
   const currentUser = await prisma.user.findUnique({
     where: { id: decoded.id },
     select: {
