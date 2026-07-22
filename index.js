@@ -4,7 +4,9 @@ require("dotenv").config();
 const path = require("path");
 const morgan = require('morgan');
 const app = express();
-// const { errorHandler } = require("./Middlewares/errorHandler");
+const { errorHandler } = require("./Middlewares/errorHandler");
+const authRoutes = require("./Routes/Auth/AuthRoutes");
+
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -21,7 +23,8 @@ app.use(morgan('dev'));
 
 
 
-
+// ===== Routes =====
+app.use("/api/auth", authRoutes);
 
 
 
@@ -41,7 +44,7 @@ app.all(/(.*)/, (req, res, next) => {
 });
 
 // ===== Global Error Handler =====
-// app.use(errorHandler);
+app.use(errorHandler);
 
 // ===== Start =====
 const port = process.env.PORT || 8000;
