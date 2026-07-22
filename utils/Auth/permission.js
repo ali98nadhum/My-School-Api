@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { prisma } = require("../config/prismaClient"); 
+const { prisma } = require("../../config/prismaClient"); 
 
 exports.checkPermission = (requiredPermissionCode) => {
   return asyncHandler(async (req, res, next) => {

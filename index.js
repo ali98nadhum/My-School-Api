@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const app = express();
 const { errorHandler } = require("./Middlewares/errorHandler");
 const authRoutes = require("./Routes/Auth/AuthRoutes");
-
+const ManagementRoutes = require("./Routes/ManagementRoutes/AllRoutes");
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -25,7 +25,7 @@ app.use(morgan('dev'));
 
 // ===== Routes =====
 app.use("/api/auth", authRoutes);
-
+app.use("/api/management", ManagementRoutes);
 
 
 

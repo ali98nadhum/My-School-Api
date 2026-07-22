@@ -22,6 +22,28 @@ async function main() {
 
   console.log('تم إنشاء حساب السوبر أدمن بنجاح:');
   console.log({ email: superAdmin.email, role: superAdmin.role });
+
+  // 3. إضافة الصلاحيات الأساسية للمدارس
+  const permissions = [
+    { code: 'CREATE_SCHOOL', description: 'إنشاء مدرسة جديدة' },
+    { code: 'VIEW_SCHOOLS', description: 'عرض قائمة المدارس' },
+    { code: 'VIEW_SCHOOL_DETAILS', description: 'عرض تفاصيل مدرسة محددة' },
+    { code: 'UPDATE_SCHOOL', description: 'تحديث بيانات مدرسة' },
+    { code: 'DELETE_SCHOOL', description: 'حذف مدرسة' },
+  ];
+
+  console.log('جاري ضخ الصلاحيات (Permissions) إلى قاعدة البيانات...');
+  for (const perm of permissions) {
+    await prisma.permission.upsert({
+      where: { code: perm.code },
+      update: { description: perm.description }, // تحديث الوصف إذا تم تغييره لاحقاً
+      create: {
+        code: perm.code,
+        description: perm.description,
+      },
+    });
+  }
+  console.log('تم إدخال الصلاحيات بنجاح!');
 }
 
 main()
