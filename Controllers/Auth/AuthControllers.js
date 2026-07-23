@@ -15,10 +15,10 @@ const saveRefreshToken = async (userId, token, req) => {
   return prisma.refreshToken.create({
     data: {
       userId,
-      tokenHash: token,      
-      expiresAt,           
-      userAgent,            
-      ipAddress,           
+      tokenHash: token,
+      expiresAt,
+      userAgent,
+      ipAddress,
     }
   });
 };
@@ -31,7 +31,34 @@ const login = asyncHandler(async (req, res) => {
 
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) { 
+  if (!user) {
+    throw new ApiError("البريد الإلكتروني أو كلمة المرور غير صحيحة", 401);
+  }
+
+  if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
+    throw new ApiError(`حسابك مقفول مؤقتاً بسبب المحاولات الخاطئة حتى ${new Date(user.lockedUntil).toLocaleTimeString("ar-EG")}.`, 403);
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
+
+  if (!isPasswordCorrect) {
+    const failedAttempts = user.failedLoginAttempts + 1;
+    const MAX_ATTEMPTS = 5;
+
+    let updateData = { failedLoginAttempts: failedAttempts };
+
+    if (failedAttempts >= MAX_ATTEMPTS) {
+      const lockedUntilDate = new Date();
+      lockedUntilDate.setMinutes(lockedUntilDate.getMinutes() + 15);
+
+      updateData.lockedUntil = lockedUntilDate;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: updateData
+    });
+
     throw new ApiError("البريد الإلكتروني أو كلمة المرور غير صحيحة", 401);
   }
 
@@ -39,8 +66,15 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError("حسابك موقوف — تواصل مع الإدارة", 403);
   }
 
+  if (user.failedLoginAttempts > 0 || user.lockedUntil) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null }
+    });
+  }
+
   const refreshToken = generateRefreshToken();
-  
+
   const savedRefreshToken = await saveRefreshToken(user.id, refreshToken, req);
   const token = generateToken(user.id, user.role, user.schoolId, savedRefreshToken.id);
 
@@ -48,11 +82,11 @@ const login = asyncHandler(async (req, res) => {
     status: "success",
     message: "تم تسجيل الدخول بنجاح",
     data: {
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role, 
-        schoolId: user.schoolId 
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        schoolId: user.schoolId
       },
       token,
       refreshToken,

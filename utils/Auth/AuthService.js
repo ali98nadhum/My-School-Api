@@ -24,7 +24,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     const session = await prisma.refreshToken.findUnique({
       where: { id: decoded.sessionId }
     });
-    
+
     if (!session || session.isRevoked) {
       return res.status(401).json({
         message: "الجلسة منتهية، يرجى تسجيل الدخول مجدداً.",
@@ -70,6 +70,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
 exports.allowedTo = (...roles) => {
   return (req, res, next) => {
+    if (req.user.role === "SUPER_ADMIN") {
+      return next();
+    }
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         message: "غير مصرح لك بالوصول إلى هذا المسار.",
