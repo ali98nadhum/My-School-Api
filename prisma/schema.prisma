@@ -340,7 +340,9 @@ model Student {
   address          String?          @db.Text
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  schoolId         Int              @map("school_id") // مدرسة الطالب
 
+  school              School               @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user                User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
   currentSection      Section?             @relation(fields: [currentSectionId], references: [id], onDelete: SetNull)
   studentGuardians    StudentGuardian[]
@@ -353,6 +355,7 @@ model Student {
   @@index([currentSectionId], map: "idx_students_current_section")
   @@index([status], map: "idx_students_status")
   @@index([nationalId], map: "idx_students_national_id")
+  @@index([schoolId], map: "idx_students_school_id")
   @@map("students")
 }
 
@@ -808,6 +811,7 @@ model School {
   holidays      Holiday[]
   galleries     Gallery[]
   academicYears AcademicYear[]
+  students      Student[]
 
   @@map("schools")
 }

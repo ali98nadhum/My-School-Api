@@ -45,6 +45,7 @@ beforeAll(async () => {
       studentCode: "STU-PARENT-TEST",
       firstNameAr: "طالب",
       lastNameAr: "تجربة",
+      schoolId: schoolId
     }
   });
   studentId = student.id;

@@ -295,7 +295,7 @@ exports.linkStudent = asyncHandler(async (req, res, next) => {
   }
 
   const student = await prisma.student.findFirst({
-    where: { id: studentId, user: { schoolId } },
+    where: { id: studentId, schoolId },
     include: { studentGuardians: true }
   });
 
