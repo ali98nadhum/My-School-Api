@@ -36,7 +36,9 @@ const options = {
   },
   // المسارات التي تحتوي على تعليقات JSDoc
   apis: [
-    path.join(__dirname, "../docs/**/*.js"),
+    "./Docs/SystemDocs/*.js",
+    "./Docs/ManagementDocs/*.js",
+    "./Docs/TeacherDocs/*.js",
   ],
 };
 

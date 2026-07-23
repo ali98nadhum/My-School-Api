@@ -10,6 +10,7 @@ const teacherRoutes = require("./TeacherRoutes");
 const parentRoutes = require("./ParentRoutes");
 const studentRoutes = require("./StudentRoutes");
 const studentEnrollmentRoutes = require("./StudentEnrollmentRoutes");
+const TimetableRoute = require("./TimetableRoutes");
 
 router.use("/staff", staffRoutes);
 router.use("/academic-years", academicYearRoutes);
@@ -20,5 +21,6 @@ router.use("/teachers", teacherRoutes);
 router.use("/parents", parentRoutes);
 router.use("/students", studentRoutes);
 router.use("/enrollments", studentEnrollmentRoutes);
+router.use("/timetables", TimetableRoute);
 
 module.exports = router;

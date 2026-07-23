@@ -51,6 +51,18 @@ enum Gender {
   @@map("gender_enum")
 }
 
+enum DayOfWeek {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+
+  @@map("day_of_week_enum")
+}
+
 // حالة تسجيل الطالب
 enum EnrollmentStatus {
   ACTIVE      @map("active") // نشط/مستمر
@@ -528,14 +540,14 @@ model Period {
 
 /// الجدول الدراسي الأسبوعي (يمنع تعارض الجداول برمجياً)
 model TimetableEntry {
-  id             Int     @id @default(autoincrement())
-  sectionId      Int     @map("section_id")
-  subjectId      Int     @map("subject_id")
-  teacherId      Int     @map("teacher_id")
-  periodId       Int     @map("period_id") @db.SmallInt // أي حصة؟
-  dayOfWeek      Int?    @map("day_of_week") @db.SmallInt // أي يوم بالاسبوع؟ (0=الاثنين..6=الأحد)
-  room           String? @db.VarChar(30) // رقم القاعة
-  academicYearId Int     @map("academic_year_id")
+  id             Int       @id @default(autoincrement())
+  sectionId      Int       @map("section_id")
+  subjectId      Int       @map("subject_id")
+  teacherId      Int       @map("teacher_id")
+  periodId       Int       @map("period_id") @db.SmallInt // أي حصة؟
+  dayOfWeek      DayOfWeek @map("day_of_week")
+  room           String?   @db.VarChar(30) // رقم القاعة
+  academicYearId Int       @map("academic_year_id")
 
   section      Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
