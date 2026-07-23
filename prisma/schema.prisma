@@ -402,10 +402,11 @@ model StudentEnrollment {
 /// جدول السنوات الدراسية (مثل: 2025/2026)
 model AcademicYear {
   id        Int       @id @default(autoincrement())
-  name      String    @unique @db.VarChar(20)
+  schoolId  Int       @default(1) @map("school_id") // مرتبط بمدرسة محددة
+  name      String    @db.VarChar(20)
   startDate DateTime? @map("start_date") @db.Date // بداية السنة
   endDate   DateTime? @map("end_date") @db.Date // نهاية السنة
-  isCurrent Boolean   @default(false) @map("is_current") // هل هي السنة الدراسية الحالية النشطة؟
+  isCurrent Boolean   @default(false) @map("is_current") // هل هي السنة الدراسية الحالية النشطة لهذه المدرسة؟
 
   schoolClasses          SchoolClass[]
   sectionSubjectTeachers SectionSubjectTeacher[]
@@ -416,7 +417,9 @@ model AcademicYear {
   lessons                Lesson[]
   feeStructures          FeeStructure[]
   invoices               Invoice[]
+  school                 School                  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
+  @@unique([schoolId, name], map: "unique_academic_year_per_school")
   @@map("academic_years")
 }
 
@@ -804,6 +807,7 @@ model School {
   events        Event[]
   holidays      Holiday[]
   galleries     Gallery[]
+  academicYears AcademicYear[]
 
   @@map("schools")
 }

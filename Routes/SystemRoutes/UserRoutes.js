@@ -14,13 +14,17 @@ const { createPrincipalSchema, updatePrincipalSchema } = require("../../utils/Va
 router.use(protect);
 router.use(allowedTo("SUPER_ADMIN"));
 
+
 router.route("/")
   .get(getUsers);
 
+
 router.post("/principal", validate(createPrincipalSchema), createPrincipal);
+
 
 router.route("/:id")
   .get(getUserById);
+
 
 router.route("/principal/:id")
   .put(validate(updatePrincipalSchema), updatePrincipal)

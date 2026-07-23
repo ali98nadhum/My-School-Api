@@ -8,6 +8,8 @@ const { errorHandler } = require("./Middlewares/errorHandler");
 const authRoutes = require("./Routes/Auth/AuthRoutes");
 const SystemRoutes = require("./Routes/SystemRoutes/SystemRoutes");
 const ManagementRoutes = require("./Routes/ManagementRoutes/ManagementRoutes");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
 
 // ===== Middlewares =====
 app.use(express.json());
@@ -25,6 +27,7 @@ app.use(morgan('dev'));
 
 
 // ===== Routes =====
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/system", SystemRoutes);
 app.use("/api/management", ManagementRoutes);

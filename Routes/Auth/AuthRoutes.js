@@ -11,9 +11,13 @@ const { loginSchema, refreshTokenSchema, changePasswordSchema } = require("../..
 
 const router = express.Router();
 
+
 router.post("/login", validate(loginSchema), login);
+
 router.post("/refresh-token", validate(refreshTokenSchema), refreshToken);
+
 router.post("/logout", protect, validate(refreshTokenSchema), logout);
+
 router.post("/change-password", protect, validate(changePasswordSchema), changePassword);
 
 module.exports = router;

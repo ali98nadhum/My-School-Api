@@ -14,9 +14,11 @@ const { schoolSchema } = require("../../utils/Validators/SchoolVaildators");
 router.use(protect);
 router.use(allowedTo("SUPER_ADMIN"));
 
+
 router.route("/")
     .post(validate(schoolSchema), createSchool)
     .get(getSchools);
+
 
 router.route("/:id")
     .get(getSchoolById)
