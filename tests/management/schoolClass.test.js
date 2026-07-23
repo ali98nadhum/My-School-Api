@@ -11,7 +11,6 @@ let gradeLevelId;
 let classId;
 
 beforeAll(async () => {
-  // 1. إنشاء مدرسة
   const school = await prisma.school.create({
     data: {
       nameAr: "مدرسة اختبار الصفوف",
@@ -20,7 +19,6 @@ beforeAll(async () => {
   });
   schoolId = school.id;
 
-  // 2. إنشاء سنة دراسية تابعة للمدرسة
   const academicYear = await prisma.academicYear.create({
     data: {
       schoolId: schoolId,
@@ -30,7 +28,6 @@ beforeAll(async () => {
   });
   academicYearId = academicYear.id;
 
-  // 3. إنشاء مرحلة دراسية (Global)
   const gradeLevel = await prisma.gradeLevel.create({
     data: {
       nameEn: "Grade 1",
@@ -43,7 +40,6 @@ beforeAll(async () => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash("password123", salt);
 
-  // 4. إنشاء مدير مدرسة (Principal)
   const principal = await prisma.user.create({
     data: {
       email: "principal_classes@test.com",
@@ -55,7 +51,6 @@ beforeAll(async () => {
     },
   });
 
-  // 5. إنشاء إداري (Administrator)
   const admin = await prisma.user.create({
     data: {
       email: "admin_classes@test.com",
@@ -70,7 +65,6 @@ beforeAll(async () => {
   principalToken = global.generateTestToken(principal);
   adminToken = global.generateTestToken(admin);
 
-  // تنظيف الصفوف للمدرسة فقط
   const years = await prisma.academicYear.findMany({ where: { schoolId } });
   const yearIds = years.map(y => y.id);
   await prisma.schoolClass.deleteMany({
@@ -79,7 +73,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // تنظيف شامل
   await prisma.schoolClass.deleteMany({});
   await prisma.academicYear.deleteMany({});
   await prisma.gradeLevel.deleteMany({});
@@ -97,8 +90,7 @@ describe("School Class Management API", () => {
 
     expect(response.status).toBe(201);
     expect(response.body.status).toBe("success");
-    expect(response.body.data.nameEn).toBe("Grade 1"); // أخذ الاسم الافتراضي
-    
+    expect(response.body.data.nameEn).toBe("Grade 1");
     classId = response.body.data.id;
   });
 
