@@ -5,10 +5,12 @@ const staffRoutes = require("./StaffRoutes");
 const academicYearRoutes = require("./AcademicYearRoutes");
 const schoolClassRoutes = require("./SchoolClassRoutes");
 const sectionRoutes = require("./SectionRoutes");
+const subjectRoutes = require("./SubjectRoutes");
 
 router.use("/staff", staffRoutes);
 router.use("/academic-years", academicYearRoutes);
 router.use("/classes", schoolClassRoutes);
 router.use("/sections", sectionRoutes);
+router.use("/subjects", subjectRoutes);
 
 module.exports = router;
