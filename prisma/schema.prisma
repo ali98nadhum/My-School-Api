@@ -383,18 +383,18 @@ model StudentGuardian {
 model StudentEnrollment {
   id             Int              @id @default(autoincrement())
   studentId      Int              @map("student_id")
-  sectionId      Int              @map("section_id") // الشعبة التي درس بها
-  academicYearId Int              @map("academic_year_id") // السنة الدراسية المعنية
+  classId        Int              @map("class_id") // الصف الدراسي (يحتوي على السنة والمرحلة)
+  sectionId      Int?             @map("section_id") // الشعبة التي درس بها (اختياري)
   enrollmentDate DateTime         @default(now()) @map("enrollment_date") @db.Date
   exitDate       DateTime?        @map("exit_date") @db.Date
   status         EnrollmentStatus @default(ACTIVE)
   remarks        String?          @db.Text
 
-  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Restrict)
-  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  student     Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  schoolClass SchoolClass @relation(fields: [classId], references: [id], onDelete: Restrict)
+  section     Section?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
 
-  @@unique([studentId, academicYearId])
+  @@unique([studentId, classId])
   @@map("student_enrollments")
 }
 
@@ -414,7 +414,6 @@ model AcademicYear {
   schoolClasses          SchoolClass[]
   sectionSubjectTeachers SectionSubjectTeacher[]
   timetableEntries       TimetableEntry[]
-  studentEnrollments     StudentEnrollment[]
   attendanceRecords      AttendanceRecord[]
   exams                  Exam[]
   lessons                Lesson[]
@@ -447,9 +446,10 @@ model SchoolClass {
   nameEn         String? @map("name_en") @db.VarChar(50)
   nameAr         String? @map("name_ar") @db.VarChar(50)
 
-  gradeLevel   GradeLevel   @relation(fields: [gradeLevelId], references: [id], onDelete: Restrict)
-  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
-  sections     Section[]
+  gradeLevel         GradeLevel          @relation(fields: [gradeLevelId], references: [id], onDelete: Restrict)
+  academicYear       AcademicYear        @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  sections           Section[]
+  studentEnrollments StudentEnrollment[]
 
   @@unique([gradeLevelId, academicYearId])
   @@map("school_classes")
