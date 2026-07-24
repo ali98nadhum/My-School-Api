@@ -135,4 +135,18 @@
  *       schema:
  *         type: integer
  *       description: رقم التسليم
+ *     ExamTypeIdParam:
+ *       in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: integer
+ *       description: معرف نوع الامتحان
+ *     ExamIdParam:
+ *       in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: integer
+ *       description: معرف الامتحان
  */

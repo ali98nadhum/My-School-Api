@@ -23,4 +23,18 @@
  *       schema:
  *         type: integer
  *       description: تصفية حسب معرف السنة الدراسية
+ *     SubjectIdFilterParam:
+ *       in: query
+ *       name: subjectId
+ *       required: false
+ *       schema:
+ *         type: integer
+ *       description: تصفية حسب معرف المادة
+ *     ExamTypeIdFilterParam:
+ *       in: query
+ *       name: examTypeId
+ *       required: false
+ *       schema:
+ *         type: integer
+ *       description: تصفية حسب معرف نوع الامتحان
  */
