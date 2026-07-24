@@ -77,3 +77,29 @@
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
+
+/**
+ * @swagger
+ * /api/teacher/submissions/{submissionId}/attachment:
+ *   delete:
+ *     summary: حذف ملف تسليم الطالب (اختياري لتوفير المساحة)
+ *     tags: [👨‍🏫 المعلم - التصحيح والتسليمات]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: submissionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: معرف التسليم
+ *     responses:
+ *       200:
+ *         description: تم حذف الملف بنجاح
+ *       400:
+ *         description: لا يوجد ملف مرفق أساساً
+ *       403:
+ *         description: ليس لديك صلاحية أو التسليم لا يتبع لك
+ *       404:
+ *         description: التسليم غير موجود
+ */

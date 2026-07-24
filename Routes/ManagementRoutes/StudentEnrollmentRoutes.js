@@ -7,7 +7,8 @@ const {
   assignStudentSection,
   transferStudentSection,
   removeStudentFromSection,
-  updateEnrollmentStatus
+  updateEnrollmentStatus,
+  promoteStudent
 } = require("../../Controllers/Management/StudentEnrollmentControllers");
 const { protect, allowedTo } = require("../../utils/Auth/AuthService");
 const { validate } = require("../../utils/Validators/validatorMiddleware");
@@ -17,7 +18,8 @@ const {
   transferSectionSchema,
   updateStatusSchema,
   removeSectionSchema,
-  getEnrollmentSchema
+  getEnrollmentSchema,
+  promoteStudentSchema
 } = require("../../utils/Validators/StudentEnrollmentValidators");
 
 router.use(protect);
@@ -30,5 +32,6 @@ router.put("/:id/assign-section", validate(assignSectionSchema), assignStudentSe
 router.put("/:id/transfer", validate(transferSectionSchema), transferStudentSection);
 router.put("/:id/remove-section", validate(removeSectionSchema), removeStudentFromSection);
 router.put("/:id/status", validate(updateStatusSchema), updateEnrollmentStatus);
+router.post("/promote", validate(promoteStudentSchema), promoteStudent);
 
 module.exports = router;

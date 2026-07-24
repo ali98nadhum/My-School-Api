@@ -306,3 +306,77 @@ exports.updateEnrollmentStatus = asyncHandler(async (req, res, next) => {
     message: "تم تحديث حالة التسجيل بنجاح."
   });
 });
+
+/**
+ * @desc    Manually promote a student to a new class/section for the new academic year
+ * @route   POST /api/management/enrollments/promote
+ * @access  Private (Principal, Administrator)
+ */
+exports.promoteStudent = asyncHandler(async (req, res, next) => {
+  const { studentId, newClassId, newSectionId } = req.body;
+  const schoolId = req.user.schoolId;
+
+  // 1. Validate student
+  const student = await prisma.student.findFirst({ where: { id: studentId, schoolId } });
+  if (!student) throw new ApiError("الطالب غير موجود أو لا ينتمي لهذه المدرسة.", 404);
+
+  // 2. Find current active enrollment
+  const currentEnrollment = await prisma.studentEnrollment.findFirst({
+    where: { studentId, status: "ACTIVE" },
+    orderBy: { enrollmentDate: "desc" }
+  });
+
+  // If no active enrollment found, we can still enroll them, but maybe throw an error or just proceed?
+  // Let's assume they must have an active enrollment to be "promoted".
+  if (!currentEnrollment) {
+    throw new ApiError("لا يوجد تسجيل أكاديمي نشط لهذا الطالب ليتم ترحيله. الرجاء استخدام مسار تسجيل طالب جديد بدلاً من ذلك.", 400);
+  }
+
+  // 3. Validate new class
+  const newSchoolClass = await prisma.schoolClass.findFirst({
+    where: { id: newClassId, academicYear: { schoolId } }
+  });
+  if (!newSchoolClass) throw new ApiError("الصف الدراسي الجديد غير موجود في هذه المدرسة.", 404);
+
+  // Prevent promoting to the exact same class/section
+  if (currentEnrollment.classId === newClassId && (!newSectionId || currentEnrollment.sectionId === newSectionId)) {
+    throw new ApiError("الطالب مسجل بالفعل في هذا الصف، لا يمكن ترحيله لنفس المكان.", 400);
+  }
+
+  // 4. Validate new section if provided
+  if (newSectionId) {
+    const section = await prisma.section.findFirst({
+      where: { id: newSectionId, classId: newClassId }
+    });
+    if (!section) throw new ApiError("الشعبة المحددة غير صحيحة أو لا تنتمي للصف الجديد.", 400);
+
+    await checkSectionCapacity(newSectionId);
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // A. Mark old enrollment as GRADUATED (or TRANSFERRED depending on preference, GRADUATED usually means graduated from that level)
+    await tx.studentEnrollment.update({
+      where: { id: currentEnrollment.id },
+      data: { status: "GRADUATED" }
+    });
+
+    // B. Create new ACTIVE enrollment
+    await tx.studentEnrollment.create({
+      data: {
+        studentId,
+        classId: newClassId,
+        sectionId: newSectionId || null,
+        enrollmentDate: new Date(),
+        status: "ACTIVE"
+      }
+    });
+
+    // C. Sync student's currentSectionId
+    await syncStudentCurrentSection(tx, studentId);
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "تم ترحيل الطالب بنجاح إلى الصف الجديد."
+  });
+});

@@ -2,7 +2,7 @@
  * @swagger
  * /api/management/enrollments:
  *   get:
- *     summary: Get all student enrollments
+ *     summary: جلب جميع الطلاب
  *     operationId: getEnrollments
  *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
@@ -84,7 +84,7 @@
  * @swagger
  * /api/management/enrollments/{id}:
  *   get:
- *     summary: Get a specific student enrollment by ID
+ *     summary: جلب طالب معين من خلال المعرف
  *     operationId: getEnrollmentById
  *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
@@ -284,4 +284,40 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
+ * /api/management/enrollments/promote:
+ *   post:
+ *     summary: ترحيل الطالب يدوياً لصف جديد في سنة دراسية جديدة
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - studentId
+ *               - newClassId
+ *             properties:
+ *               studentId:
+ *                 type: integer
+ *                 example: 1
+ *               newClassId:
+ *                 type: integer
+ *                 example: 2
+ *               newSectionId:
+ *                 type: integer
+ *                 example: 3
+ *     responses:
+ *       200:
+ *         description: تم ترحيل الطالب بنجاح إلى الصف الجديد.
+ *       400:
+ *         description: خطأ في بيانات الطالب أو لا يوجد له تسجيل أكاديمي نشط.
+ *       404:
+ *         description: الطالب أو الصف غير موجود.
  */

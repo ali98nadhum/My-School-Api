@@ -49,11 +49,20 @@ const getEnrollmentSchema = z.object({
   })
 });
 
+const promoteStudentSchema = z.object({
+  body: z.object({
+    studentId: z.number().int().positive("معرف الطالب مطلوب ويجب أن يكون رقماً صحيحاً"),
+    newClassId: z.number().int().positive("معرف الصف الدراسي الجديد مطلوب"),
+    newSectionId: z.number().int().positive("معرف الشعبة الجديدة يجب أن يكون رقماً").optional().nullable()
+  })
+});
+
 module.exports = {
   enrollStudentSchema,
   assignSectionSchema,
   transferSectionSchema,
   updateStatusSchema,
   removeSectionSchema,
-  getEnrollmentSchema
+  getEnrollmentSchema,
+  promoteStudentSchema
 };
