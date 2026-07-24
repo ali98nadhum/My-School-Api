@@ -28,4 +28,9 @@ router.route("/:id")
     .put(validateUpdateHomework, updateHomework)
     .delete(validateHomeworkId, deleteHomework);
 
+const { getHomeworkSubmissions } = require("../../Controllers/Teacher/SubmissionControllers");
+const { validateGetHomeworkSubmissions } = require("../../utils/Validators/SubmissionValidators");
+
+router.get("/:homeworkId/submissions", validateGetHomeworkSubmissions, getHomeworkSubmissions);
+
 module.exports = router;
