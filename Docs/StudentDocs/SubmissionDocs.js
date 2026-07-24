@@ -1,63 +1,68 @@
 /**
  * @swagger
- * tags:
- *   name: 🎓 الطالب - تسليم الواجبs
- *   description: مسارات تسليم الواجبات الخاصة بالطالب
- */
-
-/**
- * @swagger
  * /api/student/homeworks/{homeworkId}/submissions:
  *   post:
  *     summary: رفع حل الواجب
- *     tags: [Student - Submissions]
+ *     operationId: submitHomework
+ *     tags: [🎓 الطالب - تسليم الواجب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: homeworkId
- *         schema:
- *           type: integer
- *         required: true
- *         description: رقم الواجب
+ *       - $ref: '#/components/parameters/HomeworkRefParam'
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             required:
- *               - attachment
- *             properties:
- *               attachment:
- *                 type: string
- *                 format: binary
- *                 description: ملف الحل (صورة أو PDF)
+ *             $ref: '#/components/schemas/SubmitHomeworkRequest'
  *     responses:
  *       201:
  *         description: تم رفع الحل بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HomeworkSubmissionResponse'
  *       400:
- *         description: خطأ في الملف أو قمت بالتسليم مسبقاً
+ *         description: خطأ في الملف، لم يتم إرفاق ملف الحل، أو قمت بالتسليم مسبقاً
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  *       403:
  *         description: ليس لديك صلاحية لتسليم هذا الواجب (ليس لشعبتك)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: الواجب غير موجود
- *
+ *         description: الواجب غير موجود، أو لم يتم العثور على بيانات الطالب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   get:
  *     summary: مراجعة حل الواجب الخاص بي
- *     tags: [Student - Submissions]
+ *     operationId: getMySubmission
+ *     tags: [🎓 الطالب - تسليم الواجب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: homeworkId
- *         schema:
- *           type: integer
- *         required: true
- *         description: رقم الواجب
+ *       - $ref: '#/components/parameters/HomeworkRefParam'
  *     responses:
  *       200:
  *         description: نجاح جلب بيانات التسليم الخاصة بك
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HomeworkSubmissionResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  *       404:
- *         description: لم تقم بتسليم هذا الواجب بعد
+ *         description: لم تقم بتسليم هذا الواجب بعد، أو لم يتم العثور على بيانات الطالب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

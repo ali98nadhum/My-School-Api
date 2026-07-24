@@ -1,37 +1,32 @@
 /**
  * @swagger
- * tags:
- *   name: 🏫 الإدارة - الصفوف
- *   description: مسارات إدارة الصفوف الدراسية (مخصصة لمدير المدرسة والإدارة)
- */
-
-/**
- * @swagger
  * /api/management/classes:
  *   get:
  *     summary: عرض جميع الصفوف الدراسية في مدرسة المستخدم
+ *     operationId: getSchoolClasses
  *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: query
- *         name: academicYearId
- *         schema:
- *           type: integer
- *         required: false
- *         description: تصفية حسب السنة الدراسية
+ *       - $ref: '#/components/parameters/AcademicYearIdFilterParam'
  *     responses:
  *       200:
  *         description: قائمة الصفوف الدراسية
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SchoolClassesResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  *       403:
  *         description: غير مصرح
- */
-
-/**
- * @swagger
- * /api/management/classes:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   post:
  *     summary: إنشاء صف دراسي جديد (Create School Class)
+ *     operationId: createSchoolClass
  *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
@@ -40,34 +35,34 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - gradeLevelId
- *               - academicYearId
- *             properties:
- *               gradeLevelId:
- *                 type: integer
- *                 example: 1
- *                 description: معرف المرحلة الدراسية (Global Grade Level)
- *               academicYearId:
- *                 type: integer
- *                 example: 1
- *                 description: معرف السنة الدراسية (المرتبطة بمدرسة المستخدم)
- *               nameEn:
- *                 type: string
- *                 example: "First Grade"
- *                 description: (اختياري) سيتم أخذ اسم المرحلة إن لم يحدد
- *               nameAr:
- *                 type: string
- *                 example: "الأول الابتدائي المميز"
- *                 description: (اختياري) سيتم أخذ اسم المرحلة إن لم يحدد
+ *             $ref: '#/components/schemas/CreateSchoolClassRequest'
  *     responses:
  *       201:
  *         description: تم الإنشاء بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SchoolClassResponse'
  *       400:
  *         description: يوجد صف لهذه المرحلة في هذه السنة مسبقاً
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: غير مصرح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: السنة الدراسية أو المرحلة غير موجودة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 /**
@@ -75,78 +70,101 @@
  * /api/management/classes/{id}:
  *   get:
  *     summary: عرض تفاصيل صف دراسي محدد مع الشُعب
+ *     operationId: getSchoolClassById
  *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: معرف الصف
+ *       - $ref: '#/components/parameters/SchoolClassIdParam'
  *     responses:
  *       200:
  *         description: تفاصيل الصف
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SchoolClassResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: غير مصرح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: غير موجود
- */
-
-/**
- * @swagger
- * /api/management/classes/{id}:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   put:
  *     summary: تعديل اسم الصف (Update School Class)
+ *     operationId: updateSchoolClass
  *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: معرف الصف
+ *       - $ref: '#/components/parameters/SchoolClassIdParam'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               nameEn:
- *                 type: string
- *               nameAr:
- *                 type: string
+ *             $ref: '#/components/schemas/UpdateSchoolClassRequest'
  *     responses:
  *       200:
  *         description: تم التعديل بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SchoolClassResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: غير مصرح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: غير موجود
- */
-
-/**
- * @swagger
- * /api/management/classes/{id}:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   delete:
  *     summary: حذف صف دراسي (Delete School Class)
+ *     operationId: deleteSchoolClass
  *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: معرف الصف
+ *       - $ref: '#/components/parameters/SchoolClassIdParam'
  *     responses:
  *       200:
  *         description: تم الحذف بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MessageResponse'
  *       400:
  *         description: لا يمكن الحذف لوجود شُعب دراسية مرتبطة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  *       403:
  *         description: غير مصرح (لمدير المدرسة فقط)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: غير موجود
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

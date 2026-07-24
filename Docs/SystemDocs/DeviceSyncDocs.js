@@ -1,40 +1,33 @@
 /**
  * @swagger
- * tags:
- *   name: 🛡️ النظام - مزامنة البصمة
- *   description: مسارات مزامنة أجهزة البصمة الخارجية
- */
-
-/**
- * @swagger
  * /api/device/sync:
  *   post:
  *     summary: استقبال بصمة دخول/خروج من جهاز البصمة
+ *     operationId: syncBiometricData
  *     tags: [🛡️ النظام - مزامنة البصمة]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - code
- *               - timestamp
- *             properties:
- *               code:
- *                 type: string
- *                 description: الكود الوظيفي أو كود الطالب المرسل من الجهاز
- *                 example: "T-100"
- *               timestamp:
- *                 type: string
- *                 format: date-time
- *                 description: وقت البصمة بالضبط من الجهاز
- *                 example: "2026-10-10T08:00:00Z"
+ *             $ref: '#/components/schemas/SyncBiometricRequest'
  *     responses:
  *       200:
  *         description: تم تسجيل البصمة بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SyncBiometricResponse'
  *       400:
- *         description: خطأ في البيانات المرسلة
+ *         description: خطأ في البيانات المرسلة (كود أو تاريخ/وقت غير صحيح)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: لم يتم العثور على الكود
+ *         description: لم يتم العثور على مستخدم يحمل هذا الكود
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

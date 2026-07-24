@@ -1,16 +1,10 @@
 /**
  * @swagger
- * tags:
- *   name: 👨‍🏫 المعلم - الواجباتs
- *   description: إدارة الواجبات الخاصة بالمعلم
- */
-
-/**
- * @swagger
  * /api/teacher/homeworks:
  *   post:
  *     summary: إنشاء واجب جديد وتعيينه لشعبة واحدة أو عدة شعب
- *     tags: [Teacher - Homeworks]
+ *     operationId: createHomework
+ *     tags: [👨‍🏫 المعلم - الواجبات]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -18,66 +12,63 @@
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             required:
- *               - sectionIds
- *               - subjectId
- *               - title
- *             properties:
- *               sectionIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: معرفات الشعب (يمكن إرسالها مفصولة بفواصل أو كمصفوفة)
- *               subjectId:
- *                 type: integer
- *                 description: معرف المادة
- *               lessonId:
- *                 type: integer
- *                 description: معرف الدرس المرتبط (اختياري)
- *               title:
- *                 type: string
- *                 description: عنوان الواجب
- *               description:
- *                 type: string
- *                 description: وصف تفصيلي للواجب
- *               dueDate:
- *                 type: string
- *                 format: date-time
- *                 description: موعد التسليم
- *               attachment:
- *                 type: string
- *                 format: binary
- *                 description: ملف الواجب (صورة أو PDF)
+ *             $ref: '#/components/schemas/CreateHomeworkRequest'
  *     responses:
  *       201:
  *         description: تم إنشاء الواجب بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HomeworkResponse'
  *       400:
  *         description: أخطاء في البيانات المرسلة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  *       403:
- *         description: لا توجد صلاحية
+ *         description: ليس لديك صلاحية لإعطاء واجب لهذه المادة في جميع الشعب المحددة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: لم يتم العثور على المعلم أو الشعب
- *
+ *         description: لم يتم العثور على المعلم أو بعض الشعب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   get:
  *     summary: جلب الواجبات الخاصة بالمعلم
- *     tags: [Teacher - Homeworks]
+ *     operationId: getTeacherHomeworks
+ *     tags: [👨‍🏫 المعلم - الواجبات]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: query
- *         name: sectionId
- *         schema:
- *           type: integer
- *         description: التصفية حسب الشعبة (اختياري)
+ *       - $ref: '#/components/parameters/SectionIdFilterParam'
  *       - in: query
  *         name: subjectId
+ *         required: false
  *         schema:
  *           type: integer
  *         description: التصفية حسب المادة (اختياري)
  *     responses:
  *       200:
  *         description: قائمة الواجبات
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HomeworksResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: لم يتم العثور على بيانات المعلم
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 /**
@@ -85,47 +76,66 @@
  * /api/teacher/homeworks/{id}:
  *   put:
  *     summary: تعديل بيانات الواجب
- *     tags: [Teacher - Homeworks]
+ *     operationId: updateHomework
+ *     tags: [👨‍🏫 المعلم - الواجبات]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: معرف الواجب
+ *       - $ref: '#/components/parameters/TeacherHomeworkIdParam'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               dueDate:
- *                 type: string
- *                 format: date-time
+ *             $ref: '#/components/schemas/UpdateHomeworkRequest'
  *     responses:
  *       200:
  *         description: تم تعديل الواجب
- *
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HomeworkResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: لا تملك صلاحية تعديل هذا الواجب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: الواجب غير موجود، أو لم يتم العثور على بيانات المعلم
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   delete:
  *     summary: حذف الواجب
- *     tags: [Teacher - Homeworks]
+ *     operationId: deleteHomework
+ *     tags: [👨‍🏫 المعلم - الواجبات]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: معرف الواجب
+ *       - $ref: '#/components/parameters/TeacherHomeworkIdParam'
  *     responses:
  *       200:
  *         description: تم الحذف بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MessageResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: لا تملك صلاحية حذف هذا الواجب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: الواجب غير موجود، أو لم يتم العثور على بيانات المعلم
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

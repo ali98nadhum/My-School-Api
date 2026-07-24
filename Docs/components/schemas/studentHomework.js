@@ -1,0 +1,15 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     StudentHomeworksResponse:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           example: success
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Homework'
+ */

@@ -1,16 +1,10 @@
 /**
  * @swagger
- * tags:
- *   name: 👨‍🏫 المعلم - الدروسs
- *   description: إدارة الدروس من قبل المعلم
- */
-
-/**
- * @swagger
  * /api/teacher/lessons:
  *   post:
  *     summary: إنشاء درس جديد
- *     tags: [Teacher - Lessons]
+ *     operationId: createLesson
+ *     tags: [👨‍🏫 المعلم - الدروس]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -18,50 +12,34 @@
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             required:
- *               - sectionIds
- *               - subjectId
- *               - title
- *             properties:
- *               sectionIds:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 description: معرفات الشعب (يمكن إرسالها مفصولة بفواصل أو كمصفوفة)
- *               subjectId:
- *                 type: integer
- *                 description: معرف المادة
- *               title:
- *                 type: string
- *                 description: عنوان الدرس
- *               description:
- *                 type: string
- *                 description: وصف الدرس (اختياري)
- *               lessonDate:
- *                 type: string
- *                 format: date
- *                 description: تاريخ الدرس (اختياري)
- *               youtubeUrl:
- *                 type: string
- *                 description: رابط يوتيوب (اختياري)
- *               image:
- *                 type: string
- *                 format: binary
- *                 description: صورة غلاف للدرس (اختياري)
- *               video:
- *                 type: string
- *                 format: binary
- *                 description: فيديو الدرس (يعالج في الخلفية، أقصى مدة 60 دقيقة)
- *               pdf:
- *                 type: string
- *                 format: binary
- *                 description: ملف PDF مرفق للدرس
+ *             $ref: '#/components/schemas/CreateLessonRequest'
  *     responses:
  *       201:
- *         description: تم إنشاء الدرس بنجاح
+ *         description: تم إنشاء الدرس بنجاح (قد تستمر معالجة الفيديو في الخلفية إن وُجد)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LessonResponse'
  *       400:
  *         description: بيانات غير صحيحة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       403:
+ *         description: ليس لديك صلاحية لرفع درس لهذه المادة في جميع الشعب المحددة
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: لم يتم العثور على المعلم أو بعض الشعب
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 /**
@@ -69,66 +47,81 @@
  * /api/teacher/lessons/sections/{sectionId}:
  *   get:
  *     summary: جلب دروس شعبة معينة
- *     tags: [Teacher - Lessons]
+ *     operationId: getSectionLessons
+ *     tags: [👨‍🏫 المعلم - الدروس]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: sectionId
- *         required: true
- *         schema:
- *           type: integer
- *         description: معرف الشعبة
+ *       - $ref: '#/components/parameters/LessonSectionIdParam'
  *     responses:
  *       200:
  *         description: تم الجلب بنجاح
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LessonsResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: لم يتم العثور على بيانات المعلم
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 /**
  * @swagger
  * /api/teacher/lessons/{id}:
  *   put:
- *     summary: تعديل درس
- *     tags: [Teacher - Lessons]
+ *     summary: تعديل درس (لا يشمل تعديل مرفقات الفيديو أو PDF)
+ *     operationId: updateLesson
+ *     tags: [👨‍🏫 المعلم - الدروس]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
+ *       - $ref: '#/components/parameters/LessonIdParam'
  *     requestBody:
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               lessonDate:
- *                 type: string
- *                 format: date
- *               image:
- *                 type: string
- *                 format: binary
+ *             $ref: '#/components/schemas/UpdateLessonRequest'
  *     responses:
  *       200:
  *         description: تم التحديث
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LessonResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: الدرس غير موجود أو لا تملك صلاحية تعديله
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *   delete:
  *     summary: حذف درس
- *     tags: [Teacher - Lessons]
+ *     operationId: deleteLesson
+ *     tags: [👨‍🏫 المعلم - الدروس]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
+ *       - $ref: '#/components/parameters/LessonIdParam'
  *     responses:
  *       200:
  *         description: تم الحذف
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MessageResponse'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         description: الدرس غير موجود أو لا تملك صلاحية حذفه
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
