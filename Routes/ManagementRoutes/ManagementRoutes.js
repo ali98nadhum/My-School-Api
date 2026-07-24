@@ -13,6 +13,7 @@ const studentEnrollmentRoutes = require("./StudentEnrollmentRoutes");
 const teacherTimetableRoutes = require("./TimetableRoutes");
 const attendanceReportRoutes = require("./AttendanceReportRoutes");
 const examRoutes = require("./ExamRoutes");
+const feeRoutes = require("./FeeRoutes");
 
 router.use("/academic-years", academicYearRoutes);
 router.use("/classes", schoolClassRoutes);
@@ -26,5 +27,6 @@ router.use("/enrollments", studentEnrollmentRoutes);
 router.use("/timetables", teacherTimetableRoutes);
 router.use("/attendance-reports", attendanceReportRoutes);
 router.use("/exams", examRoutes);
+router.use("/fees", feeRoutes);
 
 module.exports = router;

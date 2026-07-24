@@ -37,4 +37,11 @@
  *       schema:
  *         type: integer
  *       description: تصفية حسب معرف نوع الامتحان
+ *     GradeLevelIdFilterParam:
+ *       in: query
+ *       name: gradeLevelId
+ *       required: false
+ *       schema:
+ *         type: integer
+ *       description: تصفية حسب معرف المرحلة الدراسية
  */

@@ -149,4 +149,18 @@
  *       schema:
  *         type: integer
  *       description: معرف الامتحان
+ *     FeeTypeIdParam:
+ *       in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: integer
+ *       description: معرف نوع الرسم
+ *     FeeStructureIdParam:
+ *       in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: integer
+ *       description: معرف هيكلية الرسم
  */
