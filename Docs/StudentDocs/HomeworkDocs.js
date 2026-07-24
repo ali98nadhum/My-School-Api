@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Student - Homeworks
+ *   name: 🎓 الطالب - الواجباتs
  *   description: عرض الواجبات الخاصة بالطالب
  */
 

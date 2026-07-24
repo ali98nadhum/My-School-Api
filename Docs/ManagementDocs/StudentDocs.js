@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Students (إدارة المدرسة - الطلاب)
+ *   name: 👥 الإدارة - الطلاب
  *   description: مسارات إدارة بيانات الطلاب في المدرسة
  */
 
@@ -10,7 +10,7 @@
  * /api/management/students:
  *   get:
  *     summary: عرض جميع الطلاب مع الفلاتر والترقيم
- *     tags: [Management - Students (إدارة المدرسة - الطلاب)]
+ *     tags: [👥 الإدارة - الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -62,7 +62,7 @@
  * /api/management/students:
  *   post:
  *     summary: إضافة طالب جديد وربطه بأولياء الأمور
- *     tags: [Management - Students (إدارة المدرسة - الطلاب)]
+ *     tags: [👥 الإدارة - الطلاب]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -136,7 +136,7 @@
  * /api/management/students/{id}:
  *   get:
  *     summary: عرض تفاصيل الطالب
- *     tags: [Management - Students (إدارة المدرسة - الطلاب)]
+ *     tags: [👥 الإدارة - الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -155,7 +155,7 @@
  * /api/management/students/{id}:
  *   put:
  *     summary: تحديث بيانات الطالب
- *     tags: [Management - Students (إدارة المدرسة - الطلاب)]
+ *     tags: [👥 الإدارة - الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -202,7 +202,7 @@
  * /api/management/students/{id}:
  *   delete:
  *     summary: حذف الطالب (لمدير المدرسة فقط)
- *     tags: [Management - Students (إدارة المدرسة - الطلاب)]
+ *     tags: [👥 الإدارة - الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:

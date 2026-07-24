@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: System Admin - Schools (إدارة النظام - المدارس)
+ *   name: 🛡️ النظام - المدارس
  *   description: مسارات إدارة المدارس (مخصصة لمدير النظام Super Admin)
  */
 
@@ -10,7 +10,7 @@
  * /api/system/schools:
  *   get:
  *     summary: جلب جميع المدارس (Get all schools)
- *     tags: [System Admin - Schools (إدارة النظام - المدارس)]
+ *     tags: [🛡️ النظام - المدارس]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -20,7 +20,7 @@
  *         description: غير مصرح
  *   post:
  *     summary: إضافة مدرسة جديدة (Create school)
- *     tags: [System Admin - Schools (إدارة النظام - المدارس)]
+ *     tags: [🛡️ النظام - المدارس]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -57,7 +57,7 @@
  * /api/system/schools/{id}:
  *   get:
  *     summary: جلب تفاصيل مدرسة (Get school by ID)
- *     tags: [System Admin - Schools (إدارة النظام - المدارس)]
+ *     tags: [🛡️ النظام - المدارس]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -74,7 +74,7 @@
  *         description: المدرسة غير موجودة
  *   put:
  *     summary: تعديل مدرسة (Update school)
- *     tags: [System Admin - Schools (إدارة النظام - المدارس)]
+ *     tags: [🛡️ النظام - المدارس]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -106,7 +106,7 @@
  *         description: المدرسة غير موجودة
  *   delete:
  *     summary: حذف مدرسة (Delete school)
- *     tags: [System Admin - Schools (إدارة النظام - المدارس)]
+ *     tags: [🛡️ النظام - المدارس]
  *     security:
  *       - bearerAuth: []
  *     parameters:

@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - School Classes (إدارة المدرسة - الصفوف الدراسية)
+ *   name: 🏫 الإدارة - الصفوف
  *   description: مسارات إدارة الصفوف الدراسية (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/classes:
  *   get:
  *     summary: عرض جميع الصفوف الدراسية في مدرسة المستخدم
- *     tags: [Management - School Classes (إدارة المدرسة - الصفوف الدراسية)]
+ *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -32,7 +32,7 @@
  * /api/management/classes:
  *   post:
  *     summary: إنشاء صف دراسي جديد (Create School Class)
- *     tags: [Management - School Classes (إدارة المدرسة - الصفوف الدراسية)]
+ *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -75,7 +75,7 @@
  * /api/management/classes/{id}:
  *   get:
  *     summary: عرض تفاصيل صف دراسي محدد مع الشُعب
- *     tags: [Management - School Classes (إدارة المدرسة - الصفوف الدراسية)]
+ *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -97,7 +97,7 @@
  * /api/management/classes/{id}:
  *   put:
  *     summary: تعديل اسم الصف (Update School Class)
- *     tags: [Management - School Classes (إدارة المدرسة - الصفوف الدراسية)]
+ *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -130,7 +130,7 @@
  * /api/management/classes/{id}:
  *   delete:
  *     summary: حذف صف دراسي (Delete School Class)
- *     tags: [Management - School Classes (إدارة المدرسة - الصفوف الدراسية)]
+ *     tags: [🏫 الإدارة - الصفوف]
  *     security:
  *       - bearerAuth: []
  *     parameters:

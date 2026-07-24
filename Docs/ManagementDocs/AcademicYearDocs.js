@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Academic Year (إدارة المدرسة - السنوات الدراسية)
+ *   name: 🏫 الإدارة - السنوات الدراسية
  *   description: مسارات إدارة السنوات الدراسية للمدرسة (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/academic-years:
  *   get:
  *     summary: عرض جميع السنوات الدراسية (Get all academic years)
- *     tags: [Management - Academic Year (إدارة المدرسة - السنوات الدراسية)]
+ *     tags: [🏫 الإدارة - السنوات الدراسية]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -25,7 +25,7 @@
  * /api/management/academic-years:
  *   post:
  *     summary: إضافة سنة دراسية جديدة (Add Academic Year)
- *     tags: [Management - Academic Year (إدارة المدرسة - السنوات الدراسية)]
+ *     tags: [🏫 الإدارة - السنوات الدراسية]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -63,7 +63,7 @@
  * /api/management/academic-years/{id}:
  *   put:
  *     summary: تعديل بيانات سنة دراسية (Update Academic Year)
- *     tags: [Management - Academic Year (إدارة المدرسة - السنوات الدراسية)]
+ *     tags: [🏫 الإدارة - السنوات الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -106,7 +106,7 @@
  * /api/management/academic-years/{id}:
  *   delete:
  *     summary: حذف سنة دراسية (Delete Academic Year)
- *     tags: [Management - Academic Year (إدارة المدرسة - السنوات الدراسية)]
+ *     tags: [🏫 الإدارة - السنوات الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -130,7 +130,7 @@
  * /api/management/academic-years/{id}/set-current:
  *   patch:
  *     summary: تعيين السنة كـ "السنة الحالية" (Set Current Academic Year)
- *     tags: [Management - Academic Year (إدارة المدرسة - السنوات الدراسية)]
+ *     tags: [🏫 الإدارة - السنوات الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:

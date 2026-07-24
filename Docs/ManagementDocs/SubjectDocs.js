@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Subjects (إدارة المدرسة - المواد الدراسية)
+ *   name: 🏫 الإدارة - المواد الدراسية
  *   description: مسارات إدارة المواد الدراسية (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/subjects:
  *   get:
  *     summary: عرض جميع المواد الدراسية المسجلة في النظام
- *     tags: [Management - Subjects (إدارة المدرسة - المواد الدراسية)]
+ *     tags: [🏫 الإدارة - المواد الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -58,7 +58,7 @@
  * /api/management/subjects:
  *   post:
  *     summary: إضافة مادة دراسية جديدة للمنهاج العام
- *     tags: [Management - Subjects (إدارة المدرسة - المواد الدراسية)]
+ *     tags: [🏫 الإدارة - المواد الدراسية]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -98,7 +98,7 @@
  * /api/management/subjects/{id}:
  *   get:
  *     summary: عرض تفاصيل مادة محددة
- *     tags: [Management - Subjects (إدارة المدرسة - المواد الدراسية)]
+ *     tags: [🏫 الإدارة - المواد الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -120,7 +120,7 @@
  * /api/management/subjects/{id}:
  *   put:
  *     summary: تعديل مادة دراسية
- *     tags: [Management - Subjects (إدارة المدرسة - المواد الدراسية)]
+ *     tags: [🏫 الإدارة - المواد الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -159,7 +159,7 @@
  * /api/management/subjects/{id}:
  *   delete:
  *     summary: حذف مادة دراسية
- *     tags: [Management - Subjects (إدارة المدرسة - المواد الدراسية)]
+ *     tags: [🏫 الإدارة - المواد الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:

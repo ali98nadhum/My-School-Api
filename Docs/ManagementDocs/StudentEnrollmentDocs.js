@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: StudentEnrollments
+ *   name: ⏰ الإدارة - نقل وتوزيع الطلاب
  *   description: Student Enrollment Management API (Principal, Administrator)
  */
 
@@ -57,7 +57,7 @@
  * /api/management/enrollments:
  *   get:
  *     summary: Get all student enrollments
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -100,7 +100,7 @@
  * 
  *   post:
  *     summary: Enroll a student into a school class (and optionally a section)
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -121,7 +121,7 @@
  * /api/management/enrollments/{id}:
  *   get:
  *     summary: Get a specific student enrollment by ID
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -143,7 +143,7 @@
  * /api/management/enrollments/{id}/assign-section:
  *   put:
  *     summary: Assign a student to a section (if not already assigned)
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -169,7 +169,7 @@
  * /api/management/enrollments/{id}/transfer:
  *   put:
  *     summary: Transfer a student to a different section
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -197,7 +197,7 @@
  * /api/management/enrollments/{id}/remove-section:
  *   put:
  *     summary: Remove student from section (keeps enrollment in the class)
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -215,7 +215,7 @@
  * /api/management/enrollments/{id}/status:
  *   put:
  *     summary: Update student enrollment status
- *     tags: [StudentEnrollments]
+ *     tags: [⏰ الإدارة - نقل وتوزيع الطلاب]
  *     security:
  *       - bearerAuth: []
  *     parameters:

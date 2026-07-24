@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: System Admin - Grade Levels (إدارة النظام - المراحل الدراسية)
+ *   name: 🏫 الإدارة - المراحل الدراسية
  *   description: مسارات إدارة المراحل الدراسية (مخصصة لمدير النظام Super Admin، قراءة فقط لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/system/grade-levels:
  *   get:
  *     summary: عرض جميع المراحل الدراسية
- *     tags: [System Admin - Grade Levels (إدارة النظام - المراحل الدراسية)]
+ *     tags: [🏫 الإدارة - المراحل الدراسية]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -25,7 +25,7 @@
  * /api/system/grade-levels:
  *   post:
  *     summary: إضافة مرحلة دراسية جديدة
- *     tags: [System Admin - Grade Levels (إدارة النظام - المراحل الدراسية)]
+ *     tags: [🏫 الإدارة - المراحل الدراسية]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -60,7 +60,7 @@
  * /api/system/grade-levels/{id}:
  *   put:
  *     summary: تعديل مرحلة دراسية
- *     tags: [System Admin - Grade Levels (إدارة النظام - المراحل الدراسية)]
+ *     tags: [🏫 الإدارة - المراحل الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -95,7 +95,7 @@
  * /api/system/grade-levels/{id}:
  *   delete:
  *     summary: حذف مرحلة دراسية
- *     tags: [System Admin - Grade Levels (إدارة النظام - المراحل الدراسية)]
+ *     tags: [🏫 الإدارة - المراحل الدراسية]
  *     security:
  *       - bearerAuth: []
  *     parameters:

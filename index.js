@@ -10,6 +10,7 @@ const SystemRoutes = require("./Routes/SystemRoutes/SystemRoutes");
 const ManagementRoutes = require("./Routes/ManagementRoutes/ManagementRoutes");
 const TeacherRoutes = require("./Routes/TeacherRoutes/TeacherRoutes");
 const StudentRoutes = require("./Routes/StudentsRoutes/StudentRoutes");
+const DeviceSyncRoutes = require("./Routes/DeviceSyncRoutes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 
@@ -29,12 +30,13 @@ app.use(morgan('dev'));
 
 
 // ===== Routes =====
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { swaggerOptions: { filter: true } }));
 app.use("/api/auth", authRoutes);
 app.use("/api/system", SystemRoutes);
 app.use("/api/management", ManagementRoutes);
 app.use("/api/teacher", TeacherRoutes);
 app.use("/api/student", StudentRoutes);
+app.use("/api/device", DeviceSyncRoutes);
 
 
 

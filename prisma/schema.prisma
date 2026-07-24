@@ -586,6 +586,20 @@ model TimetableEntry {
 // 4. الحضور والغياب
 // =====================================================================
 
+/// البصمة البيومترية للحضور والانصراف اليومي (موظفين وطلاب)
+model DailyAttendance {
+  id             Int               @id @default(autoincrement())
+  date           DateTime          @db.Date
+  userType       UserRole          @map("user_type") // STUDENT, TEACHER, STAFF, الخ
+  referenceId    Int               @map("reference_id") // رقم الشخص
+  checkInTime    DateTime?         @map("check_in_time") @db.Timestamptz(6)
+  checkOutTime   DateTime?         @map("check_out_time") @db.Timestamptz(6)
+  status         AttendanceStatus? @default(PRESENT)
+
+  @@unique([date, userType, referenceId])
+  @@map("daily_attendances")
+}
+
 /// سجلات حضور وغياب الطلاب
 model AttendanceRecord {
   id             Int               @id @default(autoincrement())

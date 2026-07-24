@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Parents (إدارة المدرسة - أولياء الأمور)
+ *   name: 👥 الإدارة - أولياء الأمور
  *   description: مسارات إدارة أولياء الأمور وربطهم بالطلاب
  */
 
@@ -10,7 +10,7 @@
  * /api/management/parents:
  *   get:
  *     summary: عرض جميع أولياء الأمور في المدرسة مع الفلاتر والترقيم
- *     tags: [Management - Parents (إدارة المدرسة - أولياء الأمور)]
+ *     tags: [👥 الإدارة - أولياء الأمور]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -54,7 +54,7 @@
  * /api/management/parents:
  *   post:
  *     summary: إضافة ولي أمر جديد
- *     tags: [Management - Parents (إدارة المدرسة - أولياء الأمور)]
+ *     tags: [👥 الإدارة - أولياء الأمور]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -104,7 +104,7 @@
  * /api/management/parents/{id}/students:
  *   post:
  *     summary: ربط طالب بولي الأمر (الحد الأقصى 4 أولياء أمور للطالب)
- *     tags: [Management - Parents (إدارة المدرسة - أولياء الأمور)]
+ *     tags: [👥 الإدارة - أولياء الأمور]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -149,7 +149,7 @@
  * /api/management/parents/{id}/students/{studentId}:
  *   delete:
  *     summary: إلغاء ارتباط ولي الأمر بالطالب (يجب بقاء ولي أمر واحد على الأقل للطالب)
- *     tags: [Management - Parents (إدارة المدرسة - أولياء الأمور)]
+ *     tags: [👥 الإدارة - أولياء الأمور]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -175,7 +175,7 @@
  * /api/management/parents/{id}:
  *   delete:
  *     summary: حذف ولي الأمر (لمدير المدرسة فقط)
- *     tags: [Management - Parents (إدارة المدرسة - أولياء الأمور)]
+ *     tags: [👥 الإدارة - أولياء الأمور]
  *     security:
  *       - bearerAuth: []
  *     parameters:

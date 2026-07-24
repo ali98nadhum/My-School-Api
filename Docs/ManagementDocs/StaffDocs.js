@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Staff (إدارة المدرسة - الموظفين)
+ *   name: 👥 الإدارة - الموظفين
  *   description: مسارات إدارة الموظفين داخل المدرسة (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/staff:
  *   get:
  *     summary: عرض جميع الموظفين (Get all staff)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -49,7 +49,7 @@
  * /api/management/staff/admin:
  *   post:
  *     summary: إضافة موظف إداري جديد (Add Administrator)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -84,7 +84,7 @@
  * /api/management/staff/accountant:
  *   post:
  *     summary: إضافة محاسب جديد (Add Accountant)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -119,7 +119,7 @@
  * /api/management/staff/teacher:
  *   post:
  *     summary: إضافة معلم جديد (Add Teacher)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -156,7 +156,7 @@
  * /api/management/staff/{id}:
  *   put:
  *     summary: تعديل بيانات موظف (Update Staff)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -195,7 +195,7 @@
  * /api/management/staff/{id}:
  *   delete:
  *     summary: حذف موظف (Delete Staff)
- *     tags: [Management - Staff (إدارة المدرسة - الموظفين)]
+ *     tags: [👥 الإدارة - الموظفين]
  *     security:
  *       - bearerAuth: []
  *     parameters:

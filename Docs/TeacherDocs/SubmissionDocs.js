@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Teacher - Submissions
+ *   name: 👨‍🏫 المعلم - التصحيح والتسليماتs
  *   description: مسارات تصحيح ومراجعة تسليمات الواجبات الخاصة بالمعلم
  */
 

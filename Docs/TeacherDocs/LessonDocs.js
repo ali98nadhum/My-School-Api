@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Teacher - Lessons
+ *   name: 👨‍🏫 المعلم - الدروسs
  *   description: إدارة الدروس من قبل المعلم
  */
 

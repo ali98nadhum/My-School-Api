@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Sections (إدارة المدرسة - الشُعب الدراسية)
+ *   name: 🏫 الإدارة - الشُعب
  *   description: مسارات إدارة الشُعب الدراسية (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/sections:
  *   get:
  *     summary: عرض جميع الشُعب الدراسية التابعة لمدرسة المستخدم
- *     tags: [Management - Sections (إدارة المدرسة - الشُعب الدراسية)]
+ *     tags: [🏫 الإدارة - الشُعب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -32,7 +32,7 @@
  * /api/management/sections:
  *   post:
  *     summary: إنشاء شُعبة دراسية جديدة
- *     tags: [Management - Sections (إدارة المدرسة - الشُعب الدراسية)]
+ *     tags: [🏫 الإدارة - الشُعب]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -75,7 +75,7 @@
  * /api/management/sections/{id}:
  *   get:
  *     summary: عرض تفاصيل شعبة محددة
- *     tags: [Management - Sections (إدارة المدرسة - الشُعب الدراسية)]
+ *     tags: [🏫 الإدارة - الشُعب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -97,7 +97,7 @@
  * /api/management/sections/{id}:
  *   put:
  *     summary: تعديل شُعبة دراسية
- *     tags: [Management - Sections (إدارة المدرسة - الشُعب الدراسية)]
+ *     tags: [🏫 الإدارة - الشُعب]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -133,7 +133,7 @@
  * /api/management/sections/{id}:
  *   delete:
  *     summary: حذف شُعبة دراسية
- *     tags: [Management - Sections (إدارة المدرسة - الشُعب الدراسية)]
+ *     tags: [🏫 الإدارة - الشُعب]
  *     security:
  *       - bearerAuth: []
  *     parameters:

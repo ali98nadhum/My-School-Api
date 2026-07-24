@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: System Admin - Users (إدارة النظام - المستخدمين)
+ *   name: 🛡️ النظام - المستخدمين
  *   description: مسارات إدارة مدراء المدارس والمستخدمين (مخصصة لمدير النظام Super Admin)
  */
 
@@ -10,7 +10,7 @@
  * /api/system/users:
  *   get:
  *     summary: جلب جميع المستخدمين (Get all users)
- *     tags: [System Admin - Users (إدارة النظام - المستخدمين)]
+ *     tags: [🛡️ النظام - المستخدمين]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -25,7 +25,7 @@
  * /api/system/users/principal:
  *   post:
  *     summary: إضافة مدير مدرسة جديد (Create Principal)
- *     tags: [System Admin - Users (إدارة النظام - المستخدمين)]
+ *     tags: [🛡️ النظام - المستخدمين]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -65,7 +65,7 @@
  * /api/system/users/{id}:
  *   get:
  *     summary: جلب مستخدم بواسطة المعرف (Get user by ID)
- *     tags: [System Admin - Users (إدارة النظام - المستخدمين)]
+ *     tags: [🛡️ النظام - المستخدمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -87,7 +87,7 @@
  * /api/system/users/principal/{id}:
  *   put:
  *     summary: تعديل بيانات مدير مدرسة (Update Principal)
- *     tags: [System Admin - Users (إدارة النظام - المستخدمين)]
+ *     tags: [🛡️ النظام - المستخدمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -121,7 +121,7 @@
  *         description: المستخدم غير موجود
  *   delete:
  *     summary: حذف مدير مدرسة (Delete Principal)
- *     tags: [System Admin - Users (إدارة النظام - المستخدمين)]
+ *     tags: [🛡️ النظام - المستخدمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:

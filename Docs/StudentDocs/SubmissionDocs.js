@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Student - Submissions
+ *   name: 🎓 الطالب - تسليم الواجبs
  *   description: مسارات تسليم الواجبات الخاصة بالطالب
  */
 

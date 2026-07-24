@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Management - Teachers (إدارة المدرسة - المعلمين)
+ *   name: 👥 الإدارة - المعلمين
  *   description: مسارات إدارة المعلمين وتعييناتهم (مخصصة لمدير المدرسة والإدارة)
  */
 
@@ -10,7 +10,7 @@
  * /api/management/teachers:
  *   get:
  *     summary: عرض جميع المعلمين في المدرسة مع الفلاتر والترقيم
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -56,7 +56,7 @@
  * /api/management/teachers:
  *   post:
  *     summary: إضافة معلم جديد للمدرسة (إنشاء حساب + ملف المعلم)
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -103,7 +103,7 @@
  * /api/management/teachers/{id}:
  *   get:
  *     summary: عرض تفاصيل معلم محدد شاملة المواد والشعب المعين لها
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -125,7 +125,7 @@
  * /api/management/teachers/{id}:
  *   put:
  *     summary: تعديل بيانات المعلم وحسابه
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -172,7 +172,7 @@
  * /api/management/teachers/{id}/assignments:
  *   post:
  *     summary: تعيين المعلم لتدريس مادة معينة في شعبة دراسية
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -211,7 +211,7 @@
  * /api/management/teachers/{id}:
  *   delete:
  *     summary: حذف المعلم (لمدير المدرسة فقط)
- *     tags: [Management - Teachers (إدارة المدرسة - المعلمين)]
+ *     tags: [👥 الإدارة - المعلمين]
  *     security:
  *       - bearerAuth: []
  *     parameters:

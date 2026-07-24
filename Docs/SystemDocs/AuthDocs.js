@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Auth (المصادقة)
+ *   name: 🛡️ النظام - المصادقة
  *   description: مسارات تسجيل الدخول وإدارة الجلسات
  */
 
@@ -10,7 +10,7 @@
  * /api/auth/login:
  *   post:
  *     summary: تسجيل الدخول (Login)
- *     tags: [Auth (المصادقة)]
+ *     tags: [🛡️ النظام - المصادقة]
  *     requestBody:
  *       required: true
  *       content:
@@ -39,7 +39,7 @@
  * /api/auth/refresh-token:
  *   post:
  *     summary: تحديث التوكن (Refresh Token)
- *     tags: [Auth (المصادقة)]
+ *     tags: [🛡️ النظام - المصادقة]
  *     requestBody:
  *       required: true
  *       content:
@@ -63,7 +63,7 @@
  * /api/auth/logout:
  *   post:
  *     summary: تسجيل الخروج (Logout)
- *     tags: [Auth (المصادقة)]
+ *     tags: [🛡️ النظام - المصادقة]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -89,7 +89,7 @@
  * /api/auth/change-password:
  *   post:
  *     summary: تغيير كلمة المرور (Change Password)
- *     tags: [Auth (المصادقة)]
+ *     tags: [🛡️ النظام - المصادقة]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

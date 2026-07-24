@@ -1,7 +1,7 @@
 /**
  * @swagger
  * tags:
- *   name: Teacher - Homeworks
+ *   name: 👨‍🏫 المعلم - الواجباتs
  *   description: إدارة الواجبات الخاصة بالمعلم
  */
 
