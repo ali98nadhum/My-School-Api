@@ -2,11 +2,14 @@ const { ApiError } = require("../ApiError");
 
 const validate = (schema) => (req, res, next) => {
   try {
-    schema.parse({
+    const parsedData = schema.parse({
       body: req.body,
       query: req.query,
       params: req.params,
     });
+    req.body = parsedData.body !== undefined ? parsedData.body : req.body;
+    req.query = parsedData.query !== undefined ? parsedData.query : req.query;
+    req.params = parsedData.params !== undefined ? parsedData.params : req.params;
     next();
   } catch (error) {
     // If it's a Zod validation error

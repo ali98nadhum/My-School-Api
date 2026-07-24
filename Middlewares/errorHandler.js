@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { ApiError } = require("../utils/ApiError");
 
 /**
@@ -5,10 +6,20 @@ const { ApiError } = require("../utils/ApiError");
  * Placed as the last middleware in index.js
  */
 const errorHandler = (err, req, res, next) => {
+  if (req.file && fs.existsSync(req.file.path)) {
+    fs.unlinkSync(req.file.path);
+  }
+  if (req.files) {
+    Object.values(req.files).forEach((fileArray) => {
+      fileArray.forEach((f) => {
+        if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
+      });
+    });
+  }
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
-  // Prisma Known Request Error (e.g., Unique Constraint)
   if (err.code === "P2002") {
     return res.status(409).json({
       status: "fail",
@@ -16,7 +27,6 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Prisma Record Not Found
   if (err.code === "P2025") {
     return res.status(404).json({
       status: "fail",

@@ -2,6 +2,7 @@ const { prisma } = require("../../config/prismaClient");
 const asyncHandler = require("express-async-handler");
 const { ApiError } = require("../../utils/ApiError");
 const bcrypt = require("bcryptjs");
+const compressImage = require("../../utils/imageCompressor");
 
 /**
  * @desc    Get all students with pagination and filters
@@ -146,6 +147,16 @@ exports.createStudent = asyncHandler(async (req, res, next) => {
     hashedPassword = await bcrypt.hash(password, salt);
   }
 
+  let avatarUrl = null;
+  if (req.file) {
+    const compressedName = await compressImage(req.file.path, req.file.filename, {
+      outputDir: "uploads/images/avatars",
+      width: 400,
+      quality: 80
+    });
+    avatarUrl = `uploads/images/avatars/${compressedName}`;
+  }
+
   const result = await prisma.$transaction(async (tx) => {
     let createdUserId = null;
     let safeUser = null;
@@ -179,16 +190,16 @@ exports.createStudent = asyncHandler(async (req, res, next) => {
       nationalId: nationalId || null,
       nationality: nationality || null,
       enrollmentDate: enrollmentDate ? new Date(enrollmentDate) : new Date(),
-      currentSectionId: currentSectionId || null,
+      currentSectionId: currentSectionId ? parseInt(currentSectionId) : null,
       status: status || "ACTIVE",
       bloodType: bloodType || null,
       address: address || null,
+      avatarUrl,
       schoolId: schoolId,
     };
 
     const newStudent = await tx.student.create({ data: studentData });
 
-    // ربط الطالب بالآباء
     const guardiansData = parentIds.map(parentId => ({
       studentId: newStudent.id,
       parentId: parentId,
@@ -234,7 +245,6 @@ exports.updateStudent = asyncHandler(async (req, res, next) => {
     throw new ApiError("الطالب غير موجود.", 404);
   }
 
-  // منع التكرار
   if (email && student.user && email !== student.user.email) {
     const emailExists = await prisma.user.findUnique({ where: { email } });
     if (emailExists) throw new ApiError("البريد الإلكتروني مستخدم لحساب آخر.", 400);
@@ -257,6 +267,16 @@ exports.updateStudent = asyncHandler(async (req, res, next) => {
     if (parents.length !== parentIds.length) {
       throw new ApiError("بعض أو جميع أولياء الأمور المحددين غير موجودين في المدرسة.", 400);
     }
+  }
+
+  let avatarUrl = student.avatarUrl;
+  if (req.file) {
+    const compressedName = await compressImage(req.file.path, req.file.filename, {
+      outputDir: "uploads/images/avatars",
+      width: 400,
+      quality: 80
+    });
+    avatarUrl = `uploads/images/avatars/${compressedName}`;
   }
 
   await prisma.$transaction(async (tx) => {
@@ -296,10 +316,11 @@ exports.updateStudent = asyncHandler(async (req, res, next) => {
       nationalId: nationalId !== undefined ? nationalId : student.nationalId,
       nationality: nationality !== undefined ? nationality : student.nationality,
       enrollmentDate: enrollmentDate !== undefined ? (enrollmentDate ? new Date(enrollmentDate) : null) : student.enrollmentDate,
-      currentSectionId: currentSectionId !== undefined ? currentSectionId : student.currentSectionId,
+      currentSectionId: currentSectionId !== undefined ? (currentSectionId ? parseInt(currentSectionId) : null) : student.currentSectionId,
       status: status || student.status,
       bloodType: bloodType !== undefined ? bloodType : student.bloodType,
       address: address !== undefined ? address : student.address,
+      avatarUrl: avatarUrl
     };
 
     await tx.student.update({

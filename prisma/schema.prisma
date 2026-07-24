@@ -63,6 +63,25 @@ enum DayOfWeek {
   @@map("day_of_week_enum")
 }
 
+// نوع مرفق الدرس
+enum AttachmentType {
+  IMAGE
+  VIDEO
+  PDF
+  YOUTUBE_LINK
+
+  @@map("attachment_type_enum")
+}
+
+// حالة معالجة المرفق
+enum AttachmentStatus {
+  PROCESSING
+  READY
+  FAILED
+
+  @@map("attachment_status_enum")
+}
+
 // حالة تسجيل الطالب
 enum EnrollmentStatus {
   ACTIVE      @map("active") // نشط/مستمر
@@ -293,8 +312,8 @@ model Teacher {
   lastNameEn     String?   @map("last_name_en") @db.VarChar(100)
   hireDate       DateTime? @map("hire_date") @db.Date // تاريخ التعيين
   qualification  String?   @db.Text // المؤهل العلمي
-  specialization String?   @db.VarChar(100) // التخصص (رياضيات، لغة عربية..)
-  photoUrl       String?   @map("photo_url") @db.Text // صورة المعلم
+  specialization String?   @db.VarChar(100) // التخصص
+  avatarUrl      String?   @map("avatar_url") @db.Text // صورة المعلم
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -318,6 +337,7 @@ model StaffMember {
   lastNameAr   String?   @map("last_name_ar") @db.VarChar(100)
   firstNameEn  String?   @map("first_name_en") @db.VarChar(100)
   lastNameEn   String?   @map("last_name_en") @db.VarChar(100)
+  avatarUrl    String?   @map("avatar_url") @db.Text // صورة الموظف (اختياري)
   position     String?   @db.VarChar(50) // المسمى الوظيفي
   hireDate     DateTime? @map("hire_date") @db.Date
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -348,7 +368,7 @@ model Student {
   currentSectionId Int?             @map("current_section_id") // الشعبة الحالية للطالب
   status           EnrollmentStatus @default(ACTIVE)
   bloodType        String?          @map("blood_type") @db.VarChar(5)
-  photoUrl         String?          @map("photo_url") @db.Text
+  avatarUrl        String?          @map("avatar_url") @db.Text
   address          String?          @db.Text
   createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -483,7 +503,7 @@ model Section {
   timetableEntries       TimetableEntry[]
   attendanceRecords      AttendanceRecord[]
   exams                  Exam[]
-  lessons                Lesson[]
+  lessonSections         LessonSection[]
   homeworks              Homework[]
 
   @@unique([classId, name])
@@ -520,6 +540,7 @@ model SectionSubjectTeacher {
   teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
   academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
 
+
   @@unique([sectionId, subjectId, academicYearId])
   @@map("section_subject_teachers")
 }
@@ -554,6 +575,7 @@ model TimetableEntry {
   teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
   period       Period       @relation(fields: [periodId], references: [id], onDelete: Restrict)
   academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
 
   @@unique([sectionId, dayOfWeek, periodId, academicYearId]) // يمنع إعطاء شعبة مادتين بنفس الوقت
   @@unique([teacherId, dayOfWeek, periodId, academicYearId]) // يمنع المعلم من تدريس شعبتين بنفس الوقت
@@ -652,23 +674,36 @@ model ExamResult {
 /// الدروس التي يرفعها المعلم عبر التطبيق
 model Lesson {
   id             Int       @id @default(autoincrement())
-  sectionId      Int       @map("section_id")
   subjectId      Int       @map("subject_id")
   teacherId      Int       @map("teacher_id")
   academicYearId Int       @map("academic_year_id")
   title          String?   @db.VarChar(200) // عنوان الدرس
   description    String?   @db.Text // شرح مبسط
   lessonDate     DateTime? @map("lesson_date") @db.Date // تاريخ إلقاء الدرس
-  attachmentUrl  String?   @map("attachment_url") @db.Text // رابط مرفقات (PDF, فيديو يوتيوب)
+  imageUrl       String?   @map("image_url") @db.Text // صورة الغلاف الاختيارية
   createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  section      Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  teacher      Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
-  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  lessonSections LessonSection[]
+  subject        Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher        Teacher      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  attachments    LessonAttachment[]
+
   homeworks    Homework[]
 
   @@map("lessons")
+}
+
+/// جدول وسيط لربط الدرس بعدة شعب
+model LessonSection {
+  lessonId  Int @map("lesson_id")
+  sectionId Int @map("section_id")
+
+  lesson  Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, sectionId])
+  @@map("lesson_sections")
 }
 
 /// الواجبات التي يكلف بها الطلاب
@@ -742,6 +777,7 @@ model FeeStructure {
 
   gradeLevel   GradeLevel   @relation(fields: [gradeLevelId], references: [id], onDelete: Cascade)
   academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
   feeType      FeeType      @relation(fields: [feeTypeId], references: [id], onDelete: Restrict)
 
   @@unique([gradeLevelId, academicYearId, feeTypeId])
@@ -920,4 +956,19 @@ model GalleryImage {
   gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 
   @@map("gallery_images")
+}
+
+/// مرفقات الدرس (PDF, فيديو محلي، أو يوتيوب)
+model LessonAttachment {
+  id        Int              @id @default(autoincrement())
+  lessonId  Int              @map("lesson_id")
+  type      AttachmentType   // IMAGE, VIDEO, PDF, YOUTUBE_LINK
+  url       String           @db.Text // المسار المحلي أو الرابط
+  name      String?          @db.VarChar(200) // اسم الملف أو المرفق
+  status    AttachmentStatus @default(READY) // تستخدم لمراقبة حالة رفع الفيديو أو ضغطه
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  lesson    Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_attachments")
 }
