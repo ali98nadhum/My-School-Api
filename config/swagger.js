@@ -39,6 +39,7 @@ const options = {
     "./Docs/SystemDocs/*.js",
     "./Docs/ManagementDocs/*.js",
     "./Docs/TeacherDocs/*.js",
+    "./Docs/StudentDocs/*.js",
   ],
 };
 

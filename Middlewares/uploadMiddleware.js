@@ -116,7 +116,32 @@ const uploadLessonMedia = multer({
     { name: "pdf", maxCount: 1 },
 ]);
 
+const homeworkMediaStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        let destPath = "uploads/misc";
+        if (IMAGE_MIME_TYPES[file.mimetype]) destPath = "uploads/images/homeworks";
+        else if (PDF_MIME_TYPES[file.mimetype]) destPath = "uploads/docs/homeworks";
+
+        ensureDir(destPath);
+        cb(null, destPath);
+    },
+    filename: (req, file, cb) => {
+        const ext = IMAGE_MIME_TYPES[file.mimetype] || PDF_MIME_TYPES[file.mimetype];
+        if (!ext) return cb(new ApiError("الملف غير مدعوم", 400), false);
+
+        const uniqueName = `homework-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+        cb(null, uniqueName);
+    }
+});
+
+const uploadHomeworkMedia = multer({
+    storage: homeworkMediaStorage,
+    fileFilter: multiFilter([IMAGE_MIME_TYPES, PDF_MIME_TYPES], "أنواع الملفات المسموحة: صور (jpg,png,webp)، ملفات (pdf)"),
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+}).single("attachment");
+
 module.exports = {
     uploadAvatar,
-    uploadLessonMedia
+    uploadLessonMedia,
+    uploadHomeworkMedia
 };
